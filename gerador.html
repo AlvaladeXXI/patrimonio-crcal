@@ -4,35 +4,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Patrimônio CRCAL | Etiquetas</title>
 
-<title>Gerador de Etiquetas | CRCAL</title>
-
-<!-- Biblioteca QR Code -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
 <style>
-
-/* =========================================
-   CONFIGURAÇÕES GERAIS
-========================================= */
-
 :root {
     --azul: #00417D;
-    --azul-escuro: #283656;
     --fundo: #F5F7FA;
-    --texto: #17212b;
-    --cinza: #657383;
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font: 14px Arial, sans-serif;
     background: var(--fundo);
-    color: var(--texto);
+    color: #17212b;
 }
 
 header {
@@ -69,13 +57,11 @@ h1 {
 
 .help {
     font-size: 13px;
-    color: var(--cinza);
+    color: #657383;
     line-height: 1.5;
 }
 
-/* =========================================
-   FORMULÁRIO
-========================================= */
+/* FORMULÁRIO */
 
 .grid {
     display: grid;
@@ -85,13 +71,12 @@ h1 {
 
 label {
     display: block;
-    font-weight: bold;
     font-size: 12px;
+    font-weight: bold;
     margin-bottom: 5px;
 }
 
-input,
-select {
+input, select {
     width: 100%;
     padding: 10px;
     border: 1px solid #cbd5df;
@@ -99,18 +84,12 @@ select {
     font-size: 14px;
 }
 
-.wide {
-    grid-column: 1 / -1;
-}
-
-/* =========================================
-   BOTÕES
-========================================= */
+.wide { grid-column: 1 / -1; }
 
 .actions {
     display: flex;
-    gap: 9px;
     flex-wrap: wrap;
+    gap: 9px;
     margin-top: 14px;
 }
 
@@ -124,10 +103,6 @@ button {
     cursor: pointer;
 }
 
-button:hover {
-    opacity: 0.9;
-}
-
 button.alt {
     background: #e8edf2;
     color: var(--azul);
@@ -138,9 +113,7 @@ button.del {
     color: #a51b18;
 }
 
-/* =========================================
-   TABELA
-========================================= */
+/* TABELA */
 
 table {
     width: 100%;
@@ -148,28 +121,25 @@ table {
     font-size: 13px;
 }
 
-td,
-th {
+td, th {
     text-align: left;
     padding: 9px;
     border-bottom: 1px solid #e8edf2;
 }
 
-/* =========================================
-   ETIQUETAS
-========================================= */
+/* ETIQUETAS */
 
 #labels {
     display: grid;
     grid-template-columns: repeat(3, 6cm);
-    gap: 0;
     justify-content: start;
+    gap: 0;
 }
 
 .label {
     width: 6cm;
     height: 4cm;
-    padding: 3.5mm;
+    padding: 3mm;
     border: 1px dashed #b8c2cc;
     background: white;
 
@@ -186,11 +156,9 @@ th {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     color: var(--azul);
     font-weight: bold;
     font-size: 8pt;
-
     border-bottom: 1px solid var(--azul);
     padding-bottom: 1.5mm;
 }
@@ -202,11 +170,13 @@ th {
     gap: 2mm;
     flex: 1;
     min-height: 0;
+    overflow: hidden;
 }
 
 .info {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    overflow: hidden;
 }
 
 .num {
@@ -214,24 +184,26 @@ th {
     font-weight: 800;
     color: var(--azul);
     overflow-wrap: anywhere;
+    line-height: 1.1;
 }
 
 .desc {
     font-size: 8pt;
     font-weight: bold;
-    line-height: 1.15;
-    max-height: 9mm;
+    line-height: 1.2;
+    margin-top: 1.5mm;
+    overflow-wrap: anywhere;
+    max-height: 10mm;
     overflow: hidden;
-    margin-top: 1mm;
 }
 
-/* QR CODE */
+/* QR CODE - POSICIONAMENTO CORRIGIDO */
 
 .qr {
-    width: 25mm;
-    height: 25mm;
-    flex: none;
-
+    width: 20mm;
+    height: 20mm;
+    flex: 0 0 20mm;
+    overflow: hidden;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -240,9 +212,10 @@ th {
 .qr canvas,
 .qr img {
     display: block !important;
-    width: 25mm !important;
-    height: 25mm !important;
-    max-width: 100%;
+    width: 20mm !important;
+    height: 20mm !important;
+    max-width: 20mm !important;
+    max-height: 20mm !important;
 }
 
 .foot {
@@ -253,16 +226,13 @@ th {
 }
 
 .empty {
-    color: var(--cinza);
+    color: #657383;
     padding: 12px 0;
 }
 
-/* =========================================
-   RESPONSIVIDADE
-========================================= */
+/* RESPONSIVIDADE */
 
 @media (max-width: 700px) {
-
     .grid {
         grid-template-columns: 1fr;
     }
@@ -270,15 +240,11 @@ th {
     #labels {
         grid-template-columns: repeat(2, 6cm);
     }
-
 }
 
-/* =========================================
-   IMPRESSÃO
-========================================= */
+/* IMPRESSÃO */
 
 @media print {
-
     @page {
         size: A4 portrait;
         margin: 1cm;
@@ -288,8 +254,7 @@ th {
         background: white;
     }
 
-    header,
-    .no-print {
+    header, .no-print {
         display: none !important;
     }
 
@@ -313,9 +278,7 @@ th {
     .label {
         border: 1px solid #ddd;
     }
-
 }
-
 </style>
 </head>
 
@@ -327,18 +290,12 @@ th {
 
 <main>
 
-<!-- =====================================
-     CADASTRO
-====================================== -->
-
 <section class="panel no-print">
 
 <h1>Cadastrar bem e gerar etiqueta</h1>
 
 <p class="help">
-Adicione os bens, gere as etiquetas e baixe o arquivo bens.json.
-Para atualizar a consulta pública, publique o arquivo atualizado
-na raiz do repositório GitHub.
+Cadastre os bens, gere os QR Codes e baixe a base patrimonial atualizada.
 </p>
 
 <div class="grid">
@@ -389,24 +346,13 @@ na raiz do repositório GitHub.
 
     <button id="add">Adicionar bem</button>
 
-    <button class="alt" id="import">
-        Importar bens.json
-    </button>
+    <button class="alt" id="import">Importar bens.json</button>
 
-    <input
-        id="file"
-        type="file"
-        accept=".json,application/json"
-        hidden
-    >
+    <input id="file" type="file" accept=".json,application/json" hidden>
 
-    <button class="alt" id="export">
-        Baixar bens.json
-    </button>
+    <button class="alt" id="export">Baixar bens.json</button>
 
-    <button class="alt" id="print">
-        Imprimir etiquetas A4
-    </button>
+    <button class="alt" id="print">Imprimir etiquetas A4</button>
 
 </div>
 
@@ -414,10 +360,6 @@ na raiz do repositório GitHub.
 
 </section>
 
-
-<!-- =====================================
-     LISTAGEM
-====================================== -->
 
 <section class="panel no-print">
 
@@ -430,41 +372,27 @@ Nenhum bem adicionado.
 </section>
 
 
-<!-- =====================================
-     PRÉVIA DAS ETIQUETAS
-====================================== -->
-
 <section class="panel preview">
 
 <div class="no-print">
-
     <h1>Prévia das etiquetas — 6 × 4 cm</h1>
-
     <p class="help">
         Impressão em A4, três colunas.
-        Confira a escala de impressão em 100% / tamanho real.
+        Utilize escala de 100% / tamanho real.
     </p>
-
 </div>
 
 <div id="labels">
-
-    <p class="empty no-print">
-        As etiquetas aparecerão aqui.
-    </p>
-
+    <p class="empty no-print">As etiquetas aparecerão aqui.</p>
 </div>
 
 </section>
 
 </main>
 
-
 <script>
 
-/* =========================================
-   CONFIGURAÇÕES
-========================================= */
+/* CONFIGURAÇÕES */
 
 const BASE = 'https://alvaladexxi.github.io/patrimonio-crcal/';
 
@@ -484,19 +412,12 @@ const keys = [
     'observacao'
 ];
 
-
-/* =========================================
-   MENSAGENS
-========================================= */
-
 function mensagem(texto) {
     $('msg').textContent = texto;
 }
 
 
-/* =========================================
-   LISTAGEM DOS BENS
-========================================= */
+/* LISTAGEM */
 
 function renderList() {
 
@@ -505,34 +426,27 @@ function renderList() {
     host.replaceChildren();
 
     if (!bens.length) {
-
         host.className = 'empty';
         host.textContent = 'Nenhum bem adicionado.';
-
         return;
     }
 
     host.className = '';
 
     const tabela = document.createElement('table');
-
-    const cabecalho = document.createElement('thead');
-    const linhaCabecalho = document.createElement('tr');
+    const cabecalho = document.createElement('tr');
 
     ['Patrimônio', 'Descrição', 'Localização', ''].forEach(texto => {
-
         const th = document.createElement('th');
-
         th.textContent = texto;
-
-        linhaCabecalho.append(th);
-
+        cabecalho.append(th);
     });
 
-    cabecalho.append(linhaCabecalho);
-    tabela.append(cabecalho);
+    const thead = document.createElement('thead');
+    thead.append(cabecalho);
+    tabela.append(thead);
 
-    const corpo = document.createElement('tbody');
+    const tbody = document.createElement('tbody');
 
     bens.forEach((bem, indice) => {
 
@@ -543,47 +457,34 @@ function renderList() {
             bem.descricao,
             bem.localizacao || '—'
         ].forEach(valor => {
-
             const td = document.createElement('td');
-
             td.textContent = valor;
-
             linha.append(td);
-
         });
 
         const td = document.createElement('td');
-
         const botao = document.createElement('button');
 
         botao.className = 'del';
         botao.textContent = 'Remover';
 
         botao.onclick = () => {
-
             bens.splice(indice, 1);
-
             render();
-
         };
 
         td.append(botao);
         linha.append(td);
-
-        corpo.append(linha);
+        tbody.append(linha);
 
     });
 
-    tabela.append(corpo);
-
+    tabela.append(tbody);
     host.append(tabela);
-
 }
 
 
-/* =========================================
-   GERAÇÃO DOS QR CODES E ETIQUETAS
-========================================= */
+/* GERAÇÃO DAS ETIQUETAS */
 
 function renderLabels() {
 
@@ -592,37 +493,25 @@ function renderLabels() {
     host.replaceChildren();
 
     if (!bens.length) {
-
         const p = document.createElement('p');
-
         p.className = 'empty no-print';
         p.textContent = 'As etiquetas aparecerão aqui.';
-
         host.append(p);
-
         return;
     }
 
     if (typeof QRCode === 'undefined') {
-
-        mensagem(
-            'Não foi possível carregar a biblioteca de QR Code. Verifique sua conexão.'
-        );
-
+        mensagem('Biblioteca QR Code não carregada. Verifique sua conexão.');
         return;
     }
 
     bens.forEach(bem => {
 
-        // Etiqueta
         const card = document.createElement('div');
-
         card.className = 'label';
-
 
         // Cabeçalho
         const head = document.createElement('div');
-
         head.className = 'head';
 
         const nome = document.createElement('span');
@@ -633,214 +522,134 @@ function renderLabels() {
 
         head.append(nome, tipo);
 
-
-        // Corpo
+        // Informações
         const body = document.createElement('div');
-
         body.className = 'body';
 
-
-        // Informações
         const info = document.createElement('div');
-
         info.className = 'info';
 
         const numero = document.createElement('div');
-
         numero.className = 'num';
         numero.textContent = bem.patrimonio;
 
         const descricao = document.createElement('div');
-
         descricao.className = 'desc';
         descricao.textContent = bem.descricao;
 
         info.append(numero, descricao);
 
-
-        // Área do QR Code
+        // QR Code
         const qrBox = document.createElement('div');
-
         qrBox.className = 'qr';
 
-
-        // Endereço individual do patrimônio
         const endereco =
             BASE + '?id=' + encodeURIComponent(bem.patrimonio);
 
+        // Rodapé
+        const foot = document.createElement('div');
+        foot.className = 'foot';
+        foot.textContent = 'ESCANEIE PARA CONSULTAR ESTE BEM';
 
         // Montagem
         body.append(info, qrBox);
-
-        const foot = document.createElement('div');
-
-        foot.className = 'foot';
-
-        foot.textContent =
-            'ESCANEIE PARA CONSULTAR ESTE BEM';
-
         card.append(head, body, foot);
-
         host.append(card);
 
-
-        // Geração do QR Code
+        // Geração individual
         try {
 
             new QRCode(qrBox, {
-
                 text: endereco,
-
-                width: 300,
-
-                height: 300,
-
+                width: 100,
+                height: 100,
                 colorDark: '#000000',
-
                 colorLight: '#ffffff',
-
                 correctLevel: QRCode.CorrectLevel.M
-
             });
 
         } catch (erro) {
 
-            console.error(
-                'Erro ao gerar QR Code:',
-                erro
-            );
-
+            console.error('Erro QR Code:', erro);
             qrBox.textContent = 'Erro ao gerar QR';
 
         }
 
     });
-
 }
 
 
-/* =========================================
-   ATUALIZAÇÃO DA INTERFACE
-========================================= */
+/* ATUALIZAR INTERFACE */
 
 function render() {
-
     renderList();
-
     renderLabels();
-
 }
 
 
-/* =========================================
-   ADICIONAR BEM
-========================================= */
+/* ADICIONAR BEM */
 
 $('add').onclick = () => {
 
     const bem = {
-
         patrimonio: trim($('pat').value),
-
         descricao: trim($('desc').value),
-
         localizacao: trim($('loc').value),
-
         marca_modelo: trim($('marca').value),
-
         responsavel: trim($('resp').value),
-
         situacao: $('sit').value,
-
         observacao: trim($('obs').value)
-
     };
 
     if (!bem.patrimonio || !bem.descricao) {
-
-        mensagem(
-            'Informe o número patrimonial e a descrição.'
-        );
-
+        mensagem('Informe o número patrimonial e a descrição.');
         return;
-
     }
 
     if (bens.some(item => item.patrimonio === bem.patrimonio)) {
-
-        mensagem(
-            'Esse número patrimonial já está na lista.'
-        );
-
+        mensagem('Esse número patrimonial já está cadastrado na lista.');
         return;
-
     }
 
     bens.push(bem);
 
-    [
-        'pat',
-        'desc',
-        'loc',
-        'marca',
-        'resp',
-        'obs'
-    ].forEach(id => {
-
+    ['pat', 'desc', 'loc', 'marca', 'resp', 'obs'].forEach(id => {
         $(id).value = '';
-
     });
 
     $('sit').value = 'Em uso';
 
-    mensagem(
-        'Bem adicionado. QR Code gerado com sucesso!'
-    );
+    mensagem('Bem adicionado e etiqueta gerada!');
 
     render();
-
 };
 
 
-/* =========================================
-   EXPORTAR JSON
-========================================= */
+/* EXPORTAR JSON */
 
 $('export').onclick = () => {
 
-    const arquivo = new Blob(
+    const blob = new Blob(
         [JSON.stringify(bens, null, 2)],
         { type: 'application/json' }
     );
 
-    const url = URL.createObjectURL(arquivo);
+    const url = URL.createObjectURL(blob);
 
     const link = document.createElement('a');
-
     link.href = url;
-
     link.download = 'bens.json';
-
     link.click();
 
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    mensagem(
-        'Arquivo bens.json baixado. Publique-o na raiz do repositório para atualizar as consultas.'
-    );
-
+    mensagem('Arquivo bens.json baixado. Publique-o no GitHub para atualizar a consulta.');
 };
 
 
-/* =========================================
-   IMPORTAR JSON
-========================================= */
+/* IMPORTAR JSON */
 
-$('import').onclick = () => {
-
-    $('file').click();
-
-};
+$('import').onclick = () => $('file').click();
 
 $('file').onchange = async evento => {
 
@@ -850,69 +659,50 @@ $('file').onchange = async evento => {
 
     try {
 
-        const dados = JSON.parse(
-            await arquivo.text()
-        );
+        const dados = JSON.parse(await arquivo.text());
 
         if (!Array.isArray(dados)) {
-
             throw new Error('Formato inválido');
-
         }
 
         bens = dados.map(item =>
-
             Object.fromEntries(
-
                 keys.map(chave => [
-
                     chave,
-
                     trim(item[chave])
-
                 ])
-
             )
-
         );
 
         render();
 
-        mensagem(
-            'Base patrimonial importada com sucesso!'
-        );
+        mensagem('Base patrimonial importada com sucesso!');
 
     } catch (erro) {
 
-        mensagem(
-            'Arquivo inválido. Selecione um bens.json válido.'
-        );
+        mensagem('Arquivo inválido. Selecione um bens.json válido.');
 
     }
 
     evento.target.value = '';
-
 };
 
 
-/* =========================================
-   IMPRESSÃO
-========================================= */
+/* IMPRESSÃO */
 
 $('print').onclick = () => {
 
     if (!bens.length) {
-
-        mensagem(
-            'Adicione ou importe pelo menos um bem antes de imprimir.'
-        );
-
+        mensagem('Adicione ou importe pelo menos um bem.');
         return;
+    }
 
+    if (typeof QRCode === 'undefined') {
+        mensagem('Não foi possível carregar a biblioteca de QR Code.');
+        return;
     }
 
     window.print();
-
 };
 
 </script>
