@@ -1,26 +1,921 @@
-<!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Gerador de etiquetas | CRCAL</title><script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Gerador de Etiquetas | CRCAL</title>
+
+<!-- Biblioteca QR Code -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
 <style>
-:root{--azul:#00417D;--fundo:#F5F7FA}*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:var(--fundo);color:#17212b}header{background:var(--azul);color:white;padding:20px}header b,main{max-width:1100px;margin:auto}main{padding:24px 16px}.panel{background:white;padding:20px;border-radius:12px;margin-bottom:18px;box-shadow:0 3px 14px #14283d12}h1{font-size:22px;color:var(--azul);margin:0 0 8px}.help{font-size:13px;color:#657383;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}label{display:block;font-weight:bold;font-size:12px;margin-bottom:5px}input,select{width:100%;padding:10px;border:1px solid #cbd5df;border-radius:7px;font-size:14px}.wide{grid-column:1/-1}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}button{border:0;border-radius:7px;padding:11px 14px;background:var(--azul);color:white;font-weight:bold;cursor:pointer}button.alt{background:#e8edf2;color:var(--azul)}button.del{background:#fff0ef;color:#a51b18}table{width:100%;border-collapse:collapse;font-size:13px}td,th{text-align:left;padding:9px;border-bottom:1px solid #e8edf2}#labels{display:grid;grid-template-columns:repeat(3,6cm);gap:0;justify-content:start}.label{width:6cm;height:4cm;padding:3.5mm;border:1px dashed #b8c2cc;background:white;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;break-inside:avoid}.head{display:flex;justify-content:space-between;color:var(--azul);font-weight:bold;font-size:8pt;border-bottom:1px solid var(--azul);padding-bottom:1.5mm}.body{display:flex;align-items:center;gap:2mm;flex:1}.info{flex:1;min-width:0}.num{font-size:18pt;font-weight:800;color:var(--azul);overflow-wrap:anywhere}.desc{font-size:8pt;font-weight:bold;line-height:1.15;max-height:9mm;overflow:hidden;margin-top:1mm}.qr{width:25mm;height:25mm;flex:none}.foot{text-align:center;font-size:6.5pt;border-top:1px solid #dce3ea;padding-top:1mm}.empty{color:#657383;padding:12px 0}
-@media(max-width:700px){.grid{grid-template-columns:1fr}#labels{grid-template-columns:repeat(2,6cm)}}
-@media print{@page{size:A4 portrait;margin:1cm}body{background:white}header,.no-print{display:none!important}main{margin:0;padding:0}.panel.preview{padding:0;box-shadow:none;margin:0}#labels{grid-template-columns:repeat(3,6cm)}.label{border:1px solid #ddd}}
-</style></head><body><header><b>CRCAL | GERADOR DE ETIQUETAS PATRIMONIAIS</b></header><main>
-<section class="panel no-print"><h1>Cadastrar bem e gerar etiqueta</h1><p class="help">Adicione os bens, gere as etiquetas e baixe o arquivo bens.json. Para que a consulta pública localize os bens, publique o arquivo atualizado na raiz do repositório GitHub.</p>
+
+/* =========================================
+   CONFIGURAÇÕES GERAIS
+========================================= */
+
+:root {
+    --azul: #00417D;
+    --azul-escuro: #283656;
+    --fundo: #F5F7FA;
+    --texto: #17212b;
+    --cinza: #657383;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+}
+
+header {
+    background: var(--azul);
+    color: white;
+    padding: 20px;
+}
+
+header b {
+    display: block;
+    max-width: 1100px;
+    margin: auto;
+}
+
+main {
+    max-width: 1100px;
+    margin: auto;
+    padding: 24px 16px;
+}
+
+.panel {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 18px;
+    box-shadow: 0 3px 14px #14283d12;
+}
+
+h1 {
+    font-size: 22px;
+    color: var(--azul);
+    margin: 0 0 8px;
+}
+
+.help {
+    font-size: 13px;
+    color: var(--cinza);
+    line-height: 1.5;
+}
+
+/* =========================================
+   FORMULÁRIO
+========================================= */
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #cbd5df;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.wide {
+    grid-column: 1 / -1;
+}
+
+/* =========================================
+   BOTÕES
+========================================= */
+
+.actions {
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    margin-top: 14px;
+}
+
+button {
+    border: 0;
+    border-radius: 7px;
+    padding: 11px 14px;
+    background: var(--azul);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+button.alt {
+    background: #e8edf2;
+    color: var(--azul);
+}
+
+button.del {
+    background: #fff0ef;
+    color: #a51b18;
+}
+
+/* =========================================
+   TABELA
+========================================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+td,
+th {
+    text-align: left;
+    padding: 9px;
+    border-bottom: 1px solid #e8edf2;
+}
+
+/* =========================================
+   ETIQUETAS
+========================================= */
+
+#labels {
+    display: grid;
+    grid-template-columns: repeat(3, 6cm);
+    gap: 0;
+    justify-content: start;
+}
+
+.label {
+    width: 6cm;
+    height: 4cm;
+    padding: 3.5mm;
+    border: 1px dashed #b8c2cc;
+    background: white;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+
+    overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+
+.head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    color: var(--azul);
+    font-weight: bold;
+    font-size: 8pt;
+
+    border-bottom: 1px solid var(--azul);
+    padding-bottom: 1.5mm;
+}
+
+.body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2mm;
+    flex: 1;
+    min-height: 0;
+}
+
+.info {
+    flex: 1;
+    min-width: 0;
+}
+
+.num {
+    font-size: 18pt;
+    font-weight: 800;
+    color: var(--azul);
+    overflow-wrap: anywhere;
+}
+
+.desc {
+    font-size: 8pt;
+    font-weight: bold;
+    line-height: 1.15;
+    max-height: 9mm;
+    overflow: hidden;
+    margin-top: 1mm;
+}
+
+/* QR CODE */
+
+.qr {
+    width: 25mm;
+    height: 25mm;
+    flex: none;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr canvas,
+.qr img {
+    display: block !important;
+    width: 25mm !important;
+    height: 25mm !important;
+    max-width: 100%;
+}
+
+.foot {
+    text-align: center;
+    font-size: 6.5pt;
+    border-top: 1px solid #dce3ea;
+    padding-top: 1mm;
+}
+
+.empty {
+    color: var(--cinza);
+    padding: 12px 0;
+}
+
+/* =========================================
+   RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    #labels {
+        grid-template-columns: repeat(2, 6cm);
+    }
+
+}
+
+/* =========================================
+   IMPRESSÃO
+========================================= */
+
+@media print {
+
+    @page {
+        size: A4 portrait;
+        margin: 1cm;
+    }
+
+    body {
+        background: white;
+    }
+
+    header,
+    .no-print {
+        display: none !important;
+    }
+
+    main {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+    }
+
+    .panel.preview {
+        padding: 0;
+        box-shadow: none;
+        margin: 0;
+    }
+
+    #labels {
+        grid-template-columns: repeat(3, 6cm);
+        gap: 0;
+    }
+
+    .label {
+        border: 1px solid #ddd;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+    <b>CRCAL | GERADOR DE ETIQUETAS PATRIMONIAIS</b>
+</header>
+
+<main>
+
+<!-- =====================================
+     CADASTRO
+====================================== -->
+
+<section class="panel no-print">
+
+<h1>Cadastrar bem e gerar etiqueta</h1>
+
+<p class="help">
+Adicione os bens, gere as etiquetas e baixe o arquivo bens.json.
+Para atualizar a consulta pública, publique o arquivo atualizado
+na raiz do repositório GitHub.
+</p>
+
 <div class="grid">
-<div><label>Número patrimonial *</label><input id="pat" placeholder="Ex.: 001258"></div><div><label>Situação</label><select id="sit"><option>Em uso</option><option>Em estoque</option><option>Em manutenção</option><option>Baixado</option></select></div>
-<div class="wide"><label>Descrição *</label><input id="desc" placeholder="Ex.: Computador Dell OptiPlex"></div>
-<div><label>Localização</label><input id="loc" placeholder="Ex.: Departamento de Cobrança"></div><div><label>Marca / modelo</label><input id="marca" placeholder="Ex.: Dell OptiPlex"></div>
-<div><label>Responsável / setor</label><input id="resp" placeholder="Ex.: DECOB"></div><div><label>Observação pública</label><input id="obs" placeholder="Opcional"></div></div>
-<div class="actions"><button id="add">Adicionar bem</button><button class="alt" id="import">Importar bens.json</button><input id="file" type="file" accept=".json,application/json" hidden><button class="alt" id="export">Baixar bens.json</button><button class="alt" id="print">Imprimir etiquetas A4</button></div><p class="help" id="msg" aria-live="polite"></p></section>
-<section class="panel no-print"><h1>Bens desta sessão</h1><div id="lista" class="empty">Nenhum bem adicionado.</div></section>
-<section class="panel preview"><div class="no-print"><h1>Prévia das etiquetas — 6 × 4 cm</h1><p class="help">Impressão em A4, três colunas. Confira a escala de impressão em 100% / tamanho real.</p></div><div id="labels"><p class="empty no-print">As etiquetas aparecerão aqui.</p></div></section>
-</main><script>
-const BASE='https://alvaladexxi.github.io/patrimonio-crcal/';let bens=[];const $=x=>document.getElementById(x),trim=x=>String(x||'').trim(),keys=['patrimonio','descricao','localizacao','marca_modelo','responsavel','situacao','observacao'];
-function renderList(){let host=$('lista');host.replaceChildren();if(!bens.length){host.textContent='Nenhum bem adicionado.';host.className='empty';return}host.className='';let t=document.createElement('table'),h=document.createElement('tr');['Patrimônio','Descrição','Localização',''].forEach(x=>{let th=document.createElement('th');th.textContent=x;h.append(th)});let thead=document.createElement('thead');thead.append(h);t.append(thead);let tb=document.createElement('tbody');bens.forEach((b,i)=>{let tr=document.createElement('tr');[b.patrimonio,b.descricao,b.localizacao||'—'].forEach(x=>{let td=document.createElement('td');td.textContent=x;tr.append(td)});let td=document.createElement('td'),bt=document.createElement('button');bt.className='del';bt.textContent='Remover';bt.onclick=()=>{bens.splice(i,1);render()};td.append(bt);tr.append(td);tb.append(tr)});t.append(tb);host.append(t)}
-async function renderLabels(){let host=$('labels');host.replaceChildren();if(!bens.length){let p=document.createElement('p');p.className='empty no-print';p.textContent='As etiquetas aparecerão aqui.';host.append(p);return}for(const b of bens){let card=document.createElement('div');card.className='label';let head=document.createElement('div');head.className='head';head.innerHTML='<span>CRCAL</span><span>PATRIMÔNIO</span>';let body=document.createElement('div');body.className='body';let info=document.createElement('div');info.className='info';let num=document.createElement('div');num.className='num';num.textContent=b.patrimonio;let desc=document.createElement('div');desc.className='desc';desc.textContent=b.descricao;info.append(num,desc);let canvas=document.createElement('canvas');canvas.className='qr';canvas.width=300;canvas.height=300;body.append(info,canvas);let foot=document.createElement('div');foot.className='foot';foot.textContent='ESCANEIE PARA CONSULTAR ESTE BEM';card.append(head,body,foot);host.append(card);await QRCode.toCanvas(canvas,BASE+'?id='+encodeURIComponent(b.patrimonio),{width:300,margin:1,errorCorrectionLevel:'M'})}}
-function render(){renderList();renderLabels()}
-$('add').onclick=()=>{let b={patrimonio:trim($('pat').value),descricao:trim($('desc').value),localizacao:trim($('loc').value),marca_modelo:trim($('marca').value),responsavel:trim($('resp').value),situacao:$('sit').value,observacao:trim($('obs').value)};if(!b.patrimonio||!b.descricao){$('msg').textContent='Informe o número patrimonial e a descrição.';return}if(bens.some(x=>x.patrimonio===b.patrimonio)){$('msg').textContent='Esse número já está na lista.';return}bens.push(b);['pat','desc','loc','marca','resp','obs'].forEach(x=>$(x).value='');$('sit').value='Em uso';$('msg').textContent='Bem adicionado. Etiqueta gerada abaixo.';render()};
-$('export').onclick=()=>{let blob=new Blob([JSON.stringify(bens,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bens.json';a.click();URL.revokeObjectURL(a.href);$('msg').textContent='Arquivo baixado. Publique-o na raiz do repositório para atualizar as consultas.'};
-$('import').onclick=()=>$('file').click();$('file').onchange=async e=>{try{let data=JSON.parse(await e.target.files[0].text());if(!Array.isArray(data))throw 0;bens=data.map(x=>Object.fromEntries(keys.map(k=>[k,trim(x[k])])));render();$('msg').textContent='Base importada.'}catch(err){$('msg').textContent='Arquivo inválido. Selecione um bens.json válido.'}e.target.value=''};
-$('print').onclick=()=>{if(!bens.length){$('msg').textContent='Adicione ou importe pelo menos um bem.';return}window.print()};
-</script></body></html>
+
+    <div>
+        <label>Número patrimonial *</label>
+        <input id="pat" placeholder="Ex.: 001258">
+    </div>
+
+    <div>
+        <label>Situação</label>
+        <select id="sit">
+            <option>Em uso</option>
+            <option>Em estoque</option>
+            <option>Em manutenção</option>
+            <option>Baixado</option>
+        </select>
+    </div>
+
+    <div class="wide">
+        <label>Descrição *</label>
+        <input id="desc" placeholder="Ex.: Computador Dell OptiPlex">
+    </div>
+
+    <div>
+        <label>Localização</label>
+        <input id="loc" placeholder="Ex.: Departamento de Cobrança">
+    </div>
+
+    <div>
+        <label>Marca / modelo</label>
+        <input id="marca" placeholder="Ex.: Dell OptiPlex">
+    </div>
+
+    <div>
+        <label>Responsável / setor</label>
+        <input id="resp" placeholder="Ex.: DECOB">
+    </div>
+
+    <div>
+        <label>Observação pública</label>
+        <input id="obs" placeholder="Opcional">
+    </div>
+
+</div>
+
+<div class="actions">
+
+    <button id="add">Adicionar bem</button>
+
+    <button class="alt" id="import">
+        Importar bens.json
+    </button>
+
+    <input
+        id="file"
+        type="file"
+        accept=".json,application/json"
+        hidden
+    >
+
+    <button class="alt" id="export">
+        Baixar bens.json
+    </button>
+
+    <button class="alt" id="print">
+        Imprimir etiquetas A4
+    </button>
+
+</div>
+
+<p class="help" id="msg" aria-live="polite"></p>
+
+</section>
+
+
+<!-- =====================================
+     LISTAGEM
+====================================== -->
+
+<section class="panel no-print">
+
+<h1>Bens desta sessão</h1>
+
+<div id="lista" class="empty">
+Nenhum bem adicionado.
+</div>
+
+</section>
+
+
+<!-- =====================================
+     PRÉVIA DAS ETIQUETAS
+====================================== -->
+
+<section class="panel preview">
+
+<div class="no-print">
+
+    <h1>Prévia das etiquetas — 6 × 4 cm</h1>
+
+    <p class="help">
+        Impressão em A4, três colunas.
+        Confira a escala de impressão em 100% / tamanho real.
+    </p>
+
+</div>
+
+<div id="labels">
+
+    <p class="empty no-print">
+        As etiquetas aparecerão aqui.
+    </p>
+
+</div>
+
+</section>
+
+</main>
+
+
+<script>
+
+/* =========================================
+   CONFIGURAÇÕES
+========================================= */
+
+const BASE = 'https://alvaladexxi.github.io/patrimonio-crcal/';
+
+let bens = [];
+
+const $ = id => document.getElementById(id);
+
+const trim = value => String(value || '').trim();
+
+const keys = [
+    'patrimonio',
+    'descricao',
+    'localizacao',
+    'marca_modelo',
+    'responsavel',
+    'situacao',
+    'observacao'
+];
+
+
+/* =========================================
+   MENSAGENS
+========================================= */
+
+function mensagem(texto) {
+    $('msg').textContent = texto;
+}
+
+
+/* =========================================
+   LISTAGEM DOS BENS
+========================================= */
+
+function renderList() {
+
+    const host = $('lista');
+
+    host.replaceChildren();
+
+    if (!bens.length) {
+
+        host.className = 'empty';
+        host.textContent = 'Nenhum bem adicionado.';
+
+        return;
+    }
+
+    host.className = '';
+
+    const tabela = document.createElement('table');
+
+    const cabecalho = document.createElement('thead');
+    const linhaCabecalho = document.createElement('tr');
+
+    ['Patrimônio', 'Descrição', 'Localização', ''].forEach(texto => {
+
+        const th = document.createElement('th');
+
+        th.textContent = texto;
+
+        linhaCabecalho.append(th);
+
+    });
+
+    cabecalho.append(linhaCabecalho);
+    tabela.append(cabecalho);
+
+    const corpo = document.createElement('tbody');
+
+    bens.forEach((bem, indice) => {
+
+        const linha = document.createElement('tr');
+
+        [
+            bem.patrimonio,
+            bem.descricao,
+            bem.localizacao || '—'
+        ].forEach(valor => {
+
+            const td = document.createElement('td');
+
+            td.textContent = valor;
+
+            linha.append(td);
+
+        });
+
+        const td = document.createElement('td');
+
+        const botao = document.createElement('button');
+
+        botao.className = 'del';
+        botao.textContent = 'Remover';
+
+        botao.onclick = () => {
+
+            bens.splice(indice, 1);
+
+            render();
+
+        };
+
+        td.append(botao);
+        linha.append(td);
+
+        corpo.append(linha);
+
+    });
+
+    tabela.append(corpo);
+
+    host.append(tabela);
+
+}
+
+
+/* =========================================
+   GERAÇÃO DOS QR CODES E ETIQUETAS
+========================================= */
+
+function renderLabels() {
+
+    const host = $('labels');
+
+    host.replaceChildren();
+
+    if (!bens.length) {
+
+        const p = document.createElement('p');
+
+        p.className = 'empty no-print';
+        p.textContent = 'As etiquetas aparecerão aqui.';
+
+        host.append(p);
+
+        return;
+    }
+
+    if (typeof QRCode === 'undefined') {
+
+        mensagem(
+            'Não foi possível carregar a biblioteca de QR Code. Verifique sua conexão.'
+        );
+
+        return;
+    }
+
+    bens.forEach(bem => {
+
+        // Etiqueta
+        const card = document.createElement('div');
+
+        card.className = 'label';
+
+
+        // Cabeçalho
+        const head = document.createElement('div');
+
+        head.className = 'head';
+
+        const nome = document.createElement('span');
+        nome.textContent = 'CRCAL';
+
+        const tipo = document.createElement('span');
+        tipo.textContent = 'PATRIMÔNIO';
+
+        head.append(nome, tipo);
+
+
+        // Corpo
+        const body = document.createElement('div');
+
+        body.className = 'body';
+
+
+        // Informações
+        const info = document.createElement('div');
+
+        info.className = 'info';
+
+        const numero = document.createElement('div');
+
+        numero.className = 'num';
+        numero.textContent = bem.patrimonio;
+
+        const descricao = document.createElement('div');
+
+        descricao.className = 'desc';
+        descricao.textContent = bem.descricao;
+
+        info.append(numero, descricao);
+
+
+        // Área do QR Code
+        const qrBox = document.createElement('div');
+
+        qrBox.className = 'qr';
+
+
+        // Endereço individual do patrimônio
+        const endereco =
+            BASE + '?id=' + encodeURIComponent(bem.patrimonio);
+
+
+        // Montagem
+        body.append(info, qrBox);
+
+        const foot = document.createElement('div');
+
+        foot.className = 'foot';
+
+        foot.textContent =
+            'ESCANEIE PARA CONSULTAR ESTE BEM';
+
+        card.append(head, body, foot);
+
+        host.append(card);
+
+
+        // Geração do QR Code
+        try {
+
+            new QRCode(qrBox, {
+
+                text: endereco,
+
+                width: 300,
+
+                height: 300,
+
+                colorDark: '#000000',
+
+                colorLight: '#ffffff',
+
+                correctLevel: QRCode.CorrectLevel.M
+
+            });
+
+        } catch (erro) {
+
+            console.error(
+                'Erro ao gerar QR Code:',
+                erro
+            );
+
+            qrBox.textContent = 'Erro ao gerar QR';
+
+        }
+
+    });
+
+}
+
+
+/* =========================================
+   ATUALIZAÇÃO DA INTERFACE
+========================================= */
+
+function render() {
+
+    renderList();
+
+    renderLabels();
+
+}
+
+
+/* =========================================
+   ADICIONAR BEM
+========================================= */
+
+$('add').onclick = () => {
+
+    const bem = {
+
+        patrimonio: trim($('pat').value),
+
+        descricao: trim($('desc').value),
+
+        localizacao: trim($('loc').value),
+
+        marca_modelo: trim($('marca').value),
+
+        responsavel: trim($('resp').value),
+
+        situacao: $('sit').value,
+
+        observacao: trim($('obs').value)
+
+    };
+
+    if (!bem.patrimonio || !bem.descricao) {
+
+        mensagem(
+            'Informe o número patrimonial e a descrição.'
+        );
+
+        return;
+
+    }
+
+    if (bens.some(item => item.patrimonio === bem.patrimonio)) {
+
+        mensagem(
+            'Esse número patrimonial já está na lista.'
+        );
+
+        return;
+
+    }
+
+    bens.push(bem);
+
+    [
+        'pat',
+        'desc',
+        'loc',
+        'marca',
+        'resp',
+        'obs'
+    ].forEach(id => {
+
+        $(id).value = '';
+
+    });
+
+    $('sit').value = 'Em uso';
+
+    mensagem(
+        'Bem adicionado. QR Code gerado com sucesso!'
+    );
+
+    render();
+
+};
+
+
+/* =========================================
+   EXPORTAR JSON
+========================================= */
+
+$('export').onclick = () => {
+
+    const arquivo = new Blob(
+        [JSON.stringify(bens, null, 2)],
+        { type: 'application/json' }
+    );
+
+    const url = URL.createObjectURL(arquivo);
+
+    const link = document.createElement('a');
+
+    link.href = url;
+
+    link.download = 'bens.json';
+
+    link.click();
+
+    URL.revokeObjectURL(url);
+
+    mensagem(
+        'Arquivo bens.json baixado. Publique-o na raiz do repositório para atualizar as consultas.'
+    );
+
+};
+
+
+/* =========================================
+   IMPORTAR JSON
+========================================= */
+
+$('import').onclick = () => {
+
+    $('file').click();
+
+};
+
+$('file').onchange = async evento => {
+
+    const arquivo = evento.target.files[0];
+
+    if (!arquivo) return;
+
+    try {
+
+        const dados = JSON.parse(
+            await arquivo.text()
+        );
+
+        if (!Array.isArray(dados)) {
+
+            throw new Error('Formato inválido');
+
+        }
+
+        bens = dados.map(item =>
+
+            Object.fromEntries(
+
+                keys.map(chave => [
+
+                    chave,
+
+                    trim(item[chave])
+
+                ])
+
+            )
+
+        );
+
+        render();
+
+        mensagem(
+            'Base patrimonial importada com sucesso!'
+        );
+
+    } catch (erro) {
+
+        mensagem(
+            'Arquivo inválido. Selecione um bens.json válido.'
+        );
+
+    }
+
+    evento.target.value = '';
+
+};
+
+
+/* =========================================
+   IMPRESSÃO
+========================================= */
+
+$('print').onclick = () => {
+
+    if (!bens.length) {
+
+        mensagem(
+            'Adicione ou importe pelo menos um bem antes de imprimir.'
+        );
+
+        return;
+
+    }
+
+    window.print();
+
+};
+
+</script>
+
+</body>
+</html>
