@@ -4,6 +4,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#00417D">
+
 <title>Consulta Patrimonial | CRCAL</title>
 
 <style>
@@ -14,7 +16,9 @@
     --fundo: #F5F7FA;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -26,7 +30,7 @@ body {
 header {
     background: white;
     border-bottom: 3px solid var(--dourado);
-    padding: 15px 20px;
+    padding: 20px;
 }
 
 .header-content {
@@ -34,53 +38,55 @@ header {
     margin: auto;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 18px;
 }
 
 .logo {
-    width: 65px;
-    height: 55px;
+    width: 75px;
+    height: 65px;
     object-fit: contain;
 }
 
 .header-text {
     border-left: 3px solid var(--dourado);
-    padding-left: 14px;
+    padding-left: 15px;
 }
 
 .header-text strong {
     color: var(--azul);
-    font-size: 18px;
+    font-size: 19px;
+    line-height: 1.3;
 }
 
 .header-text p {
     color: #657383;
-    font-size: 12px;
+    font-size: 13px;
     margin: 5px 0 0;
+    line-height: 1.4;
 }
 
 main {
     max-width: 760px;
     margin: auto;
-    padding: 28px 16px;
+    padding: 35px 16px;
 }
 
 .card {
     background: white;
-    border-radius: 14px;
-    padding: 25px;
-    box-shadow: 0 4px 18px #14283d12;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 4px 22px #14283d12;
 }
 
 .muted {
     color: #657383;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     letter-spacing: 1px;
 }
 
 .number {
-    font-size: 34px;
+    font-size: 38px;
     font-weight: 800;
     color: var(--azul);
     margin: 12px 0;
@@ -89,15 +95,16 @@ main {
 
 h1 {
     color: var(--azul);
-    font-size: 24px;
-    margin: 8px 0 15px;
+    font-size: 25px;
+    line-height: 1.3;
+    margin: 8px 0 18px;
 }
 
 .status {
     display: inline-block;
     background: #e8f5ed;
     color: #17683a;
-    padding: 7px 12px;
+    padding: 8px 14px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: bold;
@@ -113,9 +120,18 @@ h1 {
     color: #a51b18;
 }
 
+.status.stock {
+    background: #e8f0fa;
+    color: #00417D;
+}
+
 .field {
-    padding: 15px 0;
+    padding: 17px 0;
     border-top: 1px solid #e8edf2;
+}
+
+.field:first-child {
+    margin-top: 20px;
 }
 
 dt {
@@ -123,12 +139,14 @@ dt {
     font-size: 11px;
     font-weight: bold;
     text-transform: uppercase;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
+    letter-spacing: .5px;
 }
 
 dd {
     margin: 0;
-    font-size: 15px;
+    font-size: 16px;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
@@ -139,19 +157,58 @@ dd {
 .error p {
     color: #657383;
     line-height: 1.6;
+    font-size: 15px;
+}
+
+.loading {
+    color: #657383;
+    padding: 15px 0;
 }
 
 footer {
     text-align: center;
     color: #84909d;
-    font-size: 11px;
-    padding: 20px;
+    font-size: 12px;
+    padding: 30px 20px;
 }
 
 @media(max-width:480px) {
-    .card { padding: 19px; }
-    .number { font-size: 29px; }
-    h1 { font-size: 21px; }
+    header {
+        padding: 16px;
+    }
+
+    .header-content {
+        gap: 12px;
+    }
+
+    .logo {
+        width: 65px;
+        height: 55px;
+    }
+
+    .header-text strong {
+        font-size: 16px;
+    }
+
+    .header-text p {
+        font-size: 11px;
+    }
+
+    main {
+        padding: 28px 16px;
+    }
+
+    .card {
+        padding: 22px;
+    }
+
+    .number {
+        font-size: 34px;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
 }
 </style>
 </head>
@@ -160,29 +217,38 @@ footer {
 
 <header>
     <div class="header-content">
-        <img class="logo"
-             src="./logo-crcal.jpg"
-             alt="Logo CRCAL"
-             onerror="this.style.display='none'">
+
+        <img
+            class="logo"
+            src="./logo-crcal.jpg"
+            alt="Logo CRCAL"
+            onerror="this.style.display='none'"
+        >
 
         <div class="header-text">
             <strong>GERENCIAMENTO PATRIMONIAL</strong>
             <p>Conselho Regional de Contabilidade de Alagoas</p>
             <p>Consulta de identificação patrimonial</p>
         </div>
+
     </div>
 </header>
 
 <main>
+
     <section class="card" id="conteudo" aria-live="polite">
+
         <div class="muted">CONSULTA PATRIMONIAL</div>
-        <p>Carregando informações...</p>
+
+        <p class="loading">Carregando informações...</p>
+
     </section>
 
-    <p style="font-size:12px;color:#657383;line-height:1.6;margin-top:18px">
+    <p style="font-size:13px;color:#657383;line-height:1.7;margin-top:20px">
         Página destinada à consulta de informações patrimoniais
         autorizadas para divulgação pública.
     </p>
+
 </main>
 
 <footer>
@@ -190,11 +256,20 @@ footer {
 </footer>
 
 <script>
-const BASE = './bens.json';
 
 const box = document.getElementById('conteudo');
 
+// Normaliza os números patrimoniais para comparação
+function normalizar(valor) {
+    return String(valor ?? '')
+        .trim()
+        .replace(/\s+/g, '')
+        .toUpperCase();
+}
+
+// Exibe mensagens de erro
 function criarErro(titulo, mensagem) {
+
     box.replaceChildren();
     box.className = 'card error';
 
@@ -207,8 +282,16 @@ function criarErro(titulo, mensagem) {
     box.append(h, p);
 }
 
+// Cria campos de informação
 function criarCampo(titulo, valor) {
-    if (!valor) return;
+
+    if (
+        valor === null ||
+        valor === undefined ||
+        String(valor).trim() === ''
+    ) {
+        return null;
+    }
 
     const field = document.createElement('div');
     field.className = 'field';
@@ -217,102 +300,191 @@ function criarCampo(titulo, valor) {
     dt.textContent = titulo;
 
     const dd = document.createElement('dd');
-    dd.textContent = valor;
+    dd.textContent = String(valor);
 
     field.append(dt, dd);
+
     return field;
 }
 
-async function consultar() {
-    const id = new URLSearchParams(location.search).get('id');
+// Exibe os dados do patrimônio
+function exibirBem(bem) {
 
-    if (!id) {
-        criarErro(
-            'Patrimônio não informado',
-            'Utilize o QR Code da etiqueta para consultar o bem.'
-        );
-        return;
+    box.replaceChildren();
+    box.className = 'card';
+
+    const titulo = document.createElement('div');
+    titulo.className = 'muted';
+    titulo.textContent = 'NÚMERO PATRIMONIAL';
+
+    const numero = document.createElement('div');
+    numero.className = 'number';
+    numero.textContent = bem.patrimonio;
+
+    const descricao = document.createElement('h1');
+    descricao.textContent = bem.descricao || 'Bem patrimonial';
+
+    const status = document.createElement('span');
+    status.className = 'status';
+
+    const situacao = String(bem.situacao || 'Não informada').trim();
+
+    status.textContent = situacao;
+
+    const situacaoNormalizada = situacao.toLowerCase();
+
+    if (situacaoNormalizada === 'em manutenção'.toLowerCase()) {
+        status.classList.add('maintenance');
     }
 
+    if (situacaoNormalizada === 'baixado') {
+        status.classList.add('inactive');
+    }
+
+    if (situacaoNormalizada === 'em estoque') {
+        status.classList.add('stock');
+    }
+
+    const lista = document.createElement('dl');
+
+    const campos = [
+        ['Localização', bem.localizacao],
+        ['Marca / modelo', bem.marca_modelo],
+        ['Responsável / setor', bem.responsavel],
+        ['Observação', bem.observacao]
+    ];
+
+    campos.forEach(([titulo, valor]) => {
+
+        const campo = criarCampo(titulo, valor);
+
+        if (campo) {
+            lista.append(campo);
+        }
+
+    });
+
+    box.append(
+        titulo,
+        numero,
+        descricao,
+        status,
+        lista
+    );
+}
+
+// Consulta principal
+async function consultar() {
+
     try {
-        const resposta = await fetch(
-            BASE + '?t=' + Date.now(),
-            { cache: 'no-store' }
+
+        // Obtém o número patrimonial da URL
+        const parametros = new URLSearchParams(
+            window.location.search
         );
 
-        if (!resposta.ok) {
-            throw new Error('Não foi possível acessar a base patrimonial.');
-        }
+        const id = parametros.get('id');
 
-        const bens = await resposta.json();
+        if (!id || !normalizar(id)) {
 
-        if (!Array.isArray(bens)) {
-            throw new Error('A base patrimonial está em formato inválido.');
-        }
-
-        const bem = bens.find(
-            item => String(item.patrimonio).trim() === id.trim()
-        );
-
-        if (!bem) {
             criarErro(
-                'Bem não localizado',
-                'O patrimônio ' + id + ' não consta na base pública.'
+                'Patrimônio não informado',
+                'Utilize o QR Code da etiqueta para consultar o bem.'
             );
+
             return;
         }
 
-        box.replaceChildren();
-        box.className = 'card';
+        // Monta a URL absoluta da base JSON
+        const urlBase = new URL(
+            './bens.json',
+            window.location.href
+        );
 
-        const titulo = document.createElement('div');
-        titulo.className = 'muted';
-        titulo.textContent = 'NÚMERO PATRIMONIAL';
-
-        const numero = document.createElement('div');
-        numero.className = 'number';
-        numero.textContent = bem.patrimonio;
-
-        const descricao = document.createElement('h1');
-        descricao.textContent = bem.descricao || 'Bem patrimonial';
-
-        const status = document.createElement('span');
-        status.className = 'status';
-        status.textContent = bem.situacao || 'Não informada';
-
-        if (bem.situacao === 'Em manutenção') {
-            status.classList.add('maintenance');
-        }
-
-        if (bem.situacao === 'Baixado') {
-            status.classList.add('inactive');
-        }
-
-        const lista = document.createElement('dl');
-
-        const campos = [
-            ['Localização', bem.localizacao],
-            ['Marca / modelo', bem.marca_modelo],
-            ['Responsável / setor', bem.responsavel],
-            ['Observação', bem.observacao]
-        ];
-
-        campos.forEach(([titulo, valor]) => {
-            const campo = criarCampo(titulo, valor);
-            if (campo) lista.append(campo);
+        // Busca a base pública
+        const resposta = await fetch(urlBase.href, {
+            method: 'GET',
+            cache: 'no-store',
+            headers: {
+                'Accept': 'application/json'
+            }
         });
 
-        box.append(titulo, numero, descricao, status, lista);
+        if (!resposta.ok) {
+
+            throw new Error(
+                'Não foi possível carregar a base patrimonial. Código HTTP: ' +
+                resposta.status
+            );
+
+        }
+
+        // Lê o arquivo como texto para tratar possíveis problemas
+        const texto = await resposta.text();
+
+        const conteudoJSON = texto.replace(/^\uFEFF/, '').trim();
+
+        if (!conteudoJSON) {
+            throw new Error('O arquivo bens.json está vazio.');
+        }
+
+        // Converte o conteúdo para JSON
+        let bens;
+
+        try {
+            bens = JSON.parse(conteudoJSON);
+        } catch (e) {
+            throw new Error('O arquivo bens.json contém informações inválidas.');
+        }
+
+        if (!Array.isArray(bens)) {
+            throw new Error('A base patrimonial não possui o formato esperado.');
+        }
+
+        // Localiza o patrimônio
+        const patrimonio = normalizar(id);
+
+        const bem = bens.find(item => {
+
+            if (!item || typeof item !== 'object') {
+                return false;
+            }
+
+            return normalizar(item.patrimonio) === patrimonio;
+
+        });
+
+        if (!bem) {
+
+            criarErro(
+                'Bem não localizado',
+                'O patrimônio ' + id +
+                ' não consta na base pública. Verifique se o arquivo bens.json foi atualizado.'
+            );
+
+            return;
+        }
+
+        // Apresenta o resultado
+        exibirBem(bem);
 
     } catch (erro) {
+
+        console.error('Erro na consulta patrimonial:', erro);
+
         criarErro(
             'Erro na consulta',
-            erro.message + ' Tente novamente mais tarde.'
+            erro.message ||
+            'Não foi possível consultar este patrimônio. Tente novamente.'
         );
+
     }
+
 }
 
+// Inicia a consulta
 consultar();
+
 </script>
 
 </body>
