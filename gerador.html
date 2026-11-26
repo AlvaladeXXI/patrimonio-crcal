@@ -5,7 +5,40 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gerenciamento Patrimonial | CRCAL</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+<script>
+/* Carrega a biblioteca QRCode com endereço alternativo caso o primeiro CDN falhe. */
+window.carregarQRCode = function () {
+  if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+    return Promise.resolve(window.QRCode);
+  }
+  const fontes = [
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js',
+    'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js'
+  ];
+  return new Promise((resolve, reject) => {
+    let indice = 0;
+    function tentar() {
+      if (window.QRCode && typeof window.QRCode.toCanvas === 'function') {
+        resolve(window.QRCode);
+        return;
+      }
+      if (indice >= fontes.length) {
+        reject(new Error('Não foi possível carregar a biblioteca de QR Code. Verifique sua conexão com a internet ou bloqueio de CDN.'));
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = fontes[indice++];
+      script.onload = () => {
+        if (window.QRCode && typeof window.QRCode.toCanvas === 'function') resolve(window.QRCode);
+        else tentar();
+      };
+      script.onerror = tentar;
+      document.head.appendChild(script);
+    }
+    tentar();
+  });
+};
+</script>
 <style>
 :root{--azul:#00417D;--escuro:#283656;--ouro:#B29448;--fundo:#F5F7FA}
 *{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:var(--fundo);color:#17212b}
@@ -145,6 +178,7 @@ $('searchLabels').oninput=renderChoices;
 $('selectVisible').onclick=()=>{filteredBens($('searchLabels').value).forEach(b=>selected.add(b.id));renderChoices();say('labelMsg',selected.size+' bem(ns) selecionado(s).')};
 $('clearSelection').onclick=()=>{selected.clear();renderChoices();$('labels').replaceChildren();$('labelPreview').classList.add('hidden');$('printLabels').disabled=true;say('labelMsg','Seleção limpa.')};
 async function makeLabel(b){
+ const QRCode = await window.carregarQRCode();
  const card=document.createElement('div');card.className='label';
  const head=document.createElement('div');head.className='label-head';const brand=document.createElement('div');brand.className='label-brand';
  const logo=document.createElement('img');logo.className='label-logo';logo.src=LOGO;logo.alt='CRCAL';logo.onerror=()=>logo.style.display='none';
