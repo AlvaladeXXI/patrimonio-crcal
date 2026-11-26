@@ -110,11 +110,6 @@ input, select {
     font-size: 14px;
 }
 
-input:focus, select:focus {
-    outline: 2px solid #00417D30;
-    border-color: var(--azul);
-}
-
 .wide {
     grid-column: 1 / -1;
 }
@@ -134,10 +129,6 @@ button {
     color: white;
     font-weight: bold;
     cursor: pointer;
-}
-
-button:hover {
-    opacity: .9;
 }
 
 button:disabled {
@@ -262,6 +253,7 @@ th, td {
     height: 25mm;
     flex: 0 0 25mm;
     display: block;
+    object-fit: contain;
     background: white;
 }
 
@@ -291,7 +283,6 @@ footer {
 }
 
 @media print {
-
     @page {
         size: A4 portrait;
         margin: 1cm;
@@ -466,11 +457,7 @@ footer {
     </div>
 
     <div id="labels">
-
-        <p class="empty no-print">
-            As etiquetas aparecerão aqui.
-        </p>
-
+        <p class="empty no-print">As etiquetas aparecerão aqui.</p>
     </div>
 
 </section>
@@ -484,9 +471,9 @@ footer {
 
 <script>
 
-/* =====================================================
+/* ==========================================
    CONFIGURAÇÕES
-===================================================== */
+========================================== */
 
 const BASE = 'https://alvaladexxi.github.io/patrimonio-crcal/';
 
@@ -498,12 +485,6 @@ const $ = id => document.getElementById(id);
 
 const trim = value => String(value ?? '').trim();
 
-let bens = [];
-
-let renderId = 0;
-
-let processando = false;
-
 const CAMPOS = [
     'patrimonio',
     'descricao',
@@ -514,91 +495,67 @@ const CAMPOS = [
     'observacao'
 ];
 
+let bens = [];
 
-/* =====================================================
+let renderId = 0;
+
+let processando = false;
+
+
+/* ==========================================
    MENSAGENS
-===================================================== */
+========================================== */
 
 function mensagem(texto) {
     $('msg').textContent = texto;
 }
 
 
-/* =====================================================
-   BIBLIOTECA QR CODE
-===================================================== */
+/* ==========================================
+   GERAÇÃO DE QR CODE POR IMAGEM
+========================================== */
 
-function carregarQRCode() {
+function criarQRCode(patrimonio) {
 
-    if (typeof window.QRCode?.toCanvas === 'function') {
-        return Promise.resolve();
-    }
+    const urlConsulta =
+        CONSULTA + '?id=' + encodeURIComponent(patrimonio);
 
-    if (window.qrLoading) {
-        return window.qrLoading;
-    }
+    const urlQR =
+        'https://api.qrserver.com/v1/create-qr-code/' +
+        '?size=400x400' +
+        '&format=png' +
+        '&ecc=H' +
+        '&margin=10' +
+        '&data=' + encodeURIComponent(urlConsulta);
 
-    const fontes = [
-        'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js',
-        'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
-    ];
+    const img = document.createElement('img');
 
-    window.qrLoading = new Promise((resolve, reject) => {
+    img.className = 'qr';
 
-        function tentar(indice) {
+    img.alt = 'QR Code do patrimônio ' + patrimonio;
 
-            if (typeof window.QRCode?.toCanvas === 'function') {
-                resolve();
-                return;
-            }
+    img.loading = 'eager';
 
-            if (indice >= fontes.length) {
+    img.src = urlQR;
 
-                reject(new Error(
-                    'Biblioteca QR Code indisponível. Verifique sua conexão.'
-                ));
+    return new Promise((resolve, reject) => {
 
-                return;
-            }
+        img.onload = () => resolve(img);
 
-            const script = document.createElement('script');
-
-            script.src = fontes[indice];
-            script.async = true;
-
-            script.onload = () => {
-
-                if (typeof window.QRCode?.toCanvas === 'function') {
-                    resolve();
-                } else {
-                    tentar(indice + 1);
-                }
-
-            };
-
-            script.onerror = () => tentar(indice + 1);
-
-            document.head.appendChild(script);
-        }
-
-        tentar(0);
-
-    }).catch(erro => {
-
-        window.qrLoading = null;
-
-        throw erro;
+        img.onerror = () => reject(
+            new Error(
+                'Não foi possível carregar o QR Code do patrimônio ' +
+                patrimonio
+            )
+        );
 
     });
-
-    return window.qrLoading;
 }
 
 
-/* =====================================================
+/* ==========================================
    LISTAGEM DOS BENS
-===================================================== */
+========================================== */
 
 function renderList() {
 
@@ -689,9 +646,9 @@ function renderList() {
 }
 
 
-/* =====================================================
+/* ==========================================
    CRIAÇÃO DAS ETIQUETAS
-===================================================== */
+========================================== */
 
 async function renderLabels() {
 
@@ -714,13 +671,6 @@ async function renderLabels() {
         return;
     }
 
-    await carregarQRCode();
-
-    if (meuRender !== renderId) return;
-
-    // Construção em memória: evita etiquetas duplicadas
-    // ou prévias incompletas.
-
     const fragmento = document.createDocumentFragment();
 
     for (const bem of bens) {
@@ -730,7 +680,6 @@ async function renderLabels() {
         const card = document.createElement('div');
 
         card.className = 'label';
-
 
         // CABEÇALHO
 
@@ -796,11 +745,11 @@ async function renderLabels() {
 
         // QR CODE
 
-        const canvas = document.createElement('canvas');
+        const qr = await criarQRCode(bem.patrimonio);
 
-        canvas.className = 'qr';
+        if (meuRender !== renderId) return;
 
-        body.append(info, canvas);
+        body.append(info, qr);
 
 
         // RODAPÉ
@@ -813,30 +762,6 @@ async function renderLabels() {
 
         card.append(head, body, foot);
 
-
-        // ENDEREÇO DE CONSULTA
-
-        const url = CONSULTA + '?id=' +
-            encodeURIComponent(bem.patrimonio);
-
-
-        // GERAÇÃO DO QR CODE
-
-        await QRCode.toCanvas(canvas, url, {
-
-            width: 400,
-
-            margin: 3,
-
-            errorCorrectionLevel: 'H',
-
-            color: {
-                dark: '#000000',
-                light: '#FFFFFF'
-            }
-
-        });
-
         fragmento.append(card);
 
     }
@@ -847,9 +772,9 @@ async function renderLabels() {
 }
 
 
-/* =====================================================
+/* ==========================================
    RENDERIZAÇÃO GERAL
-===================================================== */
+========================================== */
 
 async function render() {
 
@@ -863,7 +788,7 @@ async function render() {
 
     } catch (erro) {
 
-        console.error('ERRO NA GERAÇÃO DAS ETIQUETAS:', erro);
+        console.error('Erro na geração:', erro);
 
         $('labels').replaceChildren();
 
@@ -882,9 +807,9 @@ async function render() {
 }
 
 
-/* =====================================================
+/* ==========================================
    CADASTRAR BEM
-===================================================== */
+========================================== */
 
 $('add').onclick = async () => {
 
@@ -945,7 +870,7 @@ $('add').onclick = async () => {
     } else {
 
         mensagem(
-            'Bem adicionado à sessão, mas a etiqueta não foi gerada. Verifique a conexão.'
+            'Bem cadastrado na sessão, mas houve falha na geração do QR Code.'
         );
 
     }
@@ -956,9 +881,9 @@ $('add').onclick = async () => {
 };
 
 
-/* =====================================================
+/* ==========================================
    EXPORTAR BENS.JSON
-===================================================== */
+========================================== */
 
 $('export').onclick = () => {
 
@@ -990,15 +915,13 @@ $('export').onclick = () => {
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 
-    mensagem(
-        'Arquivo baixado. Publique o novo bens.json na raiz do GitHub.'
-    );
+    mensagem('Arquivo bens.json baixado com sucesso.');
 };
 
 
-/* =====================================================
+/* ==========================================
    IMPORTAR BENS.JSON
-===================================================== */
+========================================== */
 
 $('import').onclick = () => $('file').click();
 
@@ -1050,6 +973,8 @@ $('file').onchange = async event => {
 
         }
 
+        const anterior = bens;
+
         bens = importados;
 
         const sucesso = await render();
@@ -1059,6 +984,12 @@ $('file').onchange = async event => {
             mensagem(
                 bens.length + ' bem(ns) importado(s) com sucesso!'
             );
+
+        } else {
+
+            bens = anterior;
+
+            await render();
 
         }
 
@@ -1074,9 +1005,9 @@ $('file').onchange = async event => {
 };
 
 
-/* =====================================================
+/* ==========================================
    IMPRESSÃO
-===================================================== */
+========================================== */
 
 $('print').onclick = async () => {
 
@@ -1093,7 +1024,7 @@ $('print').onclick = async () => {
 
     if (!sucesso) {
 
-        mensagem('Impressão cancelada: não foi possível gerar os QR Codes.');
+        mensagem('Impressão cancelada. Verifique a conexão.');
 
         return;
     }
@@ -1104,9 +1035,9 @@ $('print').onclick = async () => {
 };
 
 
-/* =====================================================
+/* ==========================================
    INICIALIZAÇÃO
-===================================================== */
+========================================== */
 
 render();
 
