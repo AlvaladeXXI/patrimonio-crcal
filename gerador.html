@@ -4,13 +4,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Patrimônio CRCAL | Gerador de Etiquetas</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<title>Patrimônio CRCAL | Etiquetas</title>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 
 <style>
 :root {
     --azul: #00417D;
+    --azul-escuro: #283656;
+    --dourado: #B29448;
     --fundo: #F5F7FA;
 }
 
@@ -20,22 +23,53 @@
 
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font: 14px Arial, sans-serif;
     background: var(--fundo);
     color: #17212b;
 }
 
+/* CABEÇALHO */
+
 header {
-    background: var(--azul);
-    color: white;
-    padding: 20px;
+    background: white;
+    border-bottom: 3px solid var(--dourado);
+    padding: 12px 20px;
+    box-shadow: 0 2px 12px #14283d0d;
 }
 
-header b {
-    display: block;
+.header-content {
     max-width: 1100px;
     margin: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
 }
+
+.logo {
+    width: 115px;
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.header-title {
+    border-left: 2px solid var(--dourado);
+    padding-left: 18px;
+}
+
+.header-title h1 {
+    color: var(--azul);
+    font-size: 19px;
+    margin: 0 0 5px;
+}
+
+.header-title p {
+    color: #687586;
+    font-size: 12px;
+    margin: 0;
+}
+
+/* CONTEÚDO */
 
 main {
     max-width: 1100px;
@@ -51,10 +85,10 @@ main {
     box-shadow: 0 3px 14px #14283d12;
 }
 
-h1 {
-    font-size: 22px;
+.panel h2 {
+    font-size: 21px;
     color: var(--azul);
-    margin: 0 0 8px;
+    margin: 0 0 10px;
 }
 
 .help {
@@ -73,17 +107,23 @@ h1 {
 
 label {
     display: block;
-    font-size: 12px;
     font-weight: bold;
+    font-size: 12px;
     margin-bottom: 5px;
 }
 
 input, select {
     width: 100%;
-    padding: 10px;
+    padding: 11px;
     border: 1px solid #cbd5df;
     border-radius: 7px;
     font-size: 14px;
+    background: white;
+}
+
+input:focus, select:focus {
+    outline: 2px solid #00417D30;
+    border-color: var(--azul);
 }
 
 .wide {
@@ -96,13 +136,13 @@ input, select {
     display: flex;
     flex-wrap: wrap;
     gap: 9px;
-    margin-top: 14px;
+    margin-top: 16px;
 }
 
 button {
     border: 0;
     border-radius: 7px;
-    padding: 11px 14px;
+    padding: 11px 15px;
     background: var(--azul);
     color: white;
     font-weight: bold;
@@ -123,6 +163,11 @@ button.del {
     color: #a51b18;
 }
 
+#msg {
+    margin-top: 12px;
+    min-height: 16px;
+}
+
 /* TABELA */
 
 table {
@@ -133,7 +178,7 @@ table {
 
 td, th {
     text-align: left;
-    padding: 9px;
+    padding: 10px;
     border-bottom: 1px solid #e8edf2;
 }
 
@@ -162,37 +207,34 @@ td, th {
     page-break-inside: avoid;
 }
 
-.head {
+.label-head {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     color: var(--azul);
     font-weight: bold;
     font-size: 8pt;
-
-    border-bottom: 1px solid var(--azul);
+    border-bottom: 1px solid var(--dourado);
     padding-bottom: 1.5mm;
 }
 
-.body {
+.label-body {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 2mm;
-
     flex: 1;
     min-height: 0;
     overflow: hidden;
 }
 
-.info {
+.label-info {
     flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
 }
 
-.num {
+.label-num {
     font-size: 18pt;
     font-weight: 800;
     color: var(--azul);
@@ -200,7 +242,7 @@ td, th {
     overflow-wrap: anywhere;
 }
 
-.desc {
+.label-desc {
     font-size: 7.5pt;
     font-weight: bold;
     line-height: 1.2;
@@ -216,31 +258,16 @@ td, th {
     width: 26mm;
     height: 26mm;
     flex: 0 0 26mm;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    overflow: hidden;
+    display: block;
     background: white;
 }
 
-.qr canvas,
-.qr img {
-    display: block !important;
-    width: 26mm !important;
-    height: 26mm !important;
-    max-width: 26mm !important;
-    max-height: 26mm !important;
-    object-fit: contain;
-    image-rendering: pixelated;
-}
-
-.foot {
+.label-foot {
     text-align: center;
     font-size: 6.5pt;
     border-top: 1px solid #dce3ea;
     padding-top: 1mm;
+    color: var(--azul);
 }
 
 .empty {
@@ -251,6 +278,18 @@ td, th {
 /* RESPONSIVIDADE */
 
 @media (max-width: 700px) {
+    .header-content {
+        gap: 12px;
+    }
+
+    .logo {
+        width: 85px;
+    }
+
+    .header-title h1 {
+        font-size: 15px;
+    }
+
     .grid {
         grid-template-columns: 1fr;
     }
@@ -273,8 +312,7 @@ td, th {
         background: white;
     }
 
-    header,
-    .no-print {
+    header, .no-print {
         display: none !important;
     }
 
@@ -298,14 +336,35 @@ td, th {
     .label {
         border: 1px solid #ddd;
     }
+
+    .qr {
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
 }
 </style>
 </head>
 
 <body>
 
-<header>
-    <b>CRCAL | GERADOR DE ETIQUETAS PATRIMONIAIS</b>
+<!-- CABEÇALHO PERSONALIZADO -->
+
+<header class="no-print">
+    <div class="header-content">
+
+        <img
+            src="logo-crcal.jpg"
+            alt="Logo CRCAL"
+            class="logo"
+        >
+
+        <div class="header-title">
+            <h1>GERENCIAMENTO PATRIMONIAL</h1>
+            <p>Conselho Regional de Contabilidade de Alagoas</p>
+            <p>Gerador de etiquetas e consulta de bens</p>
+        </div>
+
+    </div>
 </header>
 
 <main>
@@ -314,71 +373,76 @@ td, th {
 
 <section class="panel no-print">
 
-<h1>Cadastrar bem e gerar etiqueta</h1>
+    <h2>Cadastrar bem e gerar etiqueta</h2>
 
-<p class="help">
-Cadastre os bens, gere os QR Codes e baixe a base patrimonial atualizada.
-</p>
+    <p class="help">
+        Cadastre os bens, gere os QR Codes e exporte a base patrimonial.
+    </p>
 
-<div class="grid">
+    <div class="grid">
 
-    <div>
-        <label>Número patrimonial *</label>
-        <input id="pat" placeholder="Ex.: 001258">
+        <div>
+            <label>Número patrimonial *</label>
+            <input id="pat" placeholder="Ex.: 001258">
+        </div>
+
+        <div>
+            <label>Situação</label>
+            <select id="sit">
+                <option>Em uso</option>
+                <option>Em estoque</option>
+                <option>Em manutenção</option>
+                <option>Baixado</option>
+            </select>
+        </div>
+
+        <div class="wide">
+            <label>Descrição *</label>
+            <input id="desc" placeholder="Ex.: Computador Dell OptiPlex">
+        </div>
+
+        <div>
+            <label>Localização</label>
+            <input id="loc" placeholder="Ex.: Departamento de Cobrança">
+        </div>
+
+        <div>
+            <label>Marca / modelo</label>
+            <input id="marca" placeholder="Ex.: Dell OptiPlex">
+        </div>
+
+        <div>
+            <label>Responsável / setor</label>
+            <input id="resp" placeholder="Ex.: DECOB">
+        </div>
+
+        <div>
+            <label>Observação pública</label>
+            <input id="obs" placeholder="Opcional">
+        </div>
+
     </div>
 
-    <div>
-        <label>Situação</label>
-        <select id="sit">
-            <option>Em uso</option>
-            <option>Em estoque</option>
-            <option>Em manutenção</option>
-            <option>Baixado</option>
-        </select>
+    <div class="actions">
+
+        <button id="add">Adicionar bem</button>
+
+        <button class="alt" id="import">Importar bens.json</button>
+
+        <input
+            id="file"
+            type="file"
+            accept=".json,application/json"
+            hidden
+        >
+
+        <button class="alt" id="export">Baixar bens.json</button>
+
+        <button class="alt" id="print">Imprimir etiquetas A4</button>
+
     </div>
 
-    <div class="wide">
-        <label>Descrição *</label>
-        <input id="desc" placeholder="Ex.: Computador Dell OptiPlex">
-    </div>
-
-    <div>
-        <label>Localização</label>
-        <input id="loc" placeholder="Ex.: Departamento de Cobrança">
-    </div>
-
-    <div>
-        <label>Marca / modelo</label>
-        <input id="marca" placeholder="Ex.: Dell OptiPlex">
-    </div>
-
-    <div>
-        <label>Responsável / setor</label>
-        <input id="resp" placeholder="Ex.: DECOB">
-    </div>
-
-    <div>
-        <label>Observação pública</label>
-        <input id="obs" placeholder="Opcional">
-    </div>
-
-</div>
-
-<div class="actions">
-
-    <button id="add">Adicionar bem</button>
-
-    <button class="alt" id="import">Importar bens.json</button>
-
-    <input id="file" type="file" accept=".json,application/json" hidden>
-
-    <button class="alt" id="export">Baixar bens.json</button>
-
-    <button class="alt" id="print">Imprimir etiquetas A4</button>
-
-</div>
-
-<p class="help" id="msg" aria-live="polite"></p>
+    <p class="help" id="msg" aria-live="polite"></p>
 
 </section>
 
@@ -387,11 +451,11 @@ Cadastre os bens, gere os QR Codes e baixe a base patrimonial atualizada.
 
 <section class="panel no-print">
 
-<h1>Bens desta sessão</h1>
+    <h2>Bens desta sessão</h2>
 
-<div id="lista" class="empty">
-Nenhum bem adicionado.
-</div>
+    <div id="lista" class="empty">
+        Nenhum bem adicionado.
+    </div>
 
 </section>
 
@@ -400,24 +464,22 @@ Nenhum bem adicionado.
 
 <section class="panel preview">
 
-<div class="no-print">
+    <div class="no-print">
 
-    <h1>Prévia das etiquetas — 6 × 4 cm</h1>
+        <h2>Prévia das etiquetas — 6 × 4 cm</h2>
 
-    <p class="help">
-    Impressão em A4, três colunas.
-    Utilize escala de 100% / tamanho real.
-    </p>
+        <p class="help">
+            Impressão em A4, três colunas.
+            Utilize escala de 100% / tamanho real.
+        </p>
 
-</div>
+    </div>
 
-<div id="labels">
-
-    <p class="empty no-print">
-    As etiquetas aparecerão aqui.
-    </p>
-
-</div>
+    <div id="labels">
+        <p class="empty no-print">
+            As etiquetas aparecerão aqui.
+        </p>
+    </div>
 
 </section>
 
@@ -451,7 +513,7 @@ function mensagem(texto) {
 }
 
 
-/* LISTAGEM */
+/* LISTAGEM DOS BENS */
 
 function renderList() {
 
@@ -460,28 +522,21 @@ function renderList() {
     host.replaceChildren();
 
     if (!bens.length) {
-
         host.className = 'empty';
         host.textContent = 'Nenhum bem adicionado.';
-
         return;
     }
 
     host.className = '';
 
     const tabela = document.createElement('table');
-
     const thead = document.createElement('thead');
-
     const cabecalho = document.createElement('tr');
 
     ['Patrimônio', 'Descrição', 'Localização', ''].forEach(texto => {
-
         const th = document.createElement('th');
         th.textContent = texto;
-
         cabecalho.append(th);
-
     });
 
     thead.append(cabecalho);
@@ -501,13 +556,11 @@ function renderList() {
 
             const td = document.createElement('td');
             td.textContent = valor;
-
             linha.append(td);
 
         });
 
         const td = document.createElement('td');
-
         const botao = document.createElement('button');
 
         botao.className = 'del';
@@ -516,20 +569,17 @@ function renderList() {
         botao.onclick = () => {
 
             bens.splice(indice, 1);
-
             render();
 
         };
 
         td.append(botao);
         linha.append(td);
-
         tbody.append(linha);
 
     });
 
     tabela.append(tbody);
-
     host.append(tabela);
 
 }
@@ -537,7 +587,7 @@ function renderList() {
 
 /* GERAÇÃO DAS ETIQUETAS */
 
-function renderLabels() {
+async function renderLabels() {
 
     const host = $('labels');
 
@@ -562,132 +612,105 @@ function renderLabels() {
         return;
     }
 
-    bens.forEach(bem => {
-
-        // ETIQUETA
+    for (const bem of bens) {
 
         const card = document.createElement('div');
-
         card.className = 'label';
-
 
         // CABEÇALHO
 
         const head = document.createElement('div');
-
-        head.className = 'head';
+        head.className = 'label-head';
 
         const nome = document.createElement('span');
-
         nome.textContent = 'CRCAL';
 
         const tipo = document.createElement('span');
-
         tipo.textContent = 'PATRIMÔNIO';
 
         head.append(nome, tipo);
 
-
-        // INFORMAÇÕES DO BEM
+        // INFORMAÇÕES
 
         const body = document.createElement('div');
-
-        body.className = 'body';
+        body.className = 'label-body';
 
         const info = document.createElement('div');
-
-        info.className = 'info';
+        info.className = 'label-info';
 
         const numero = document.createElement('div');
-
-        numero.className = 'num';
-
+        numero.className = 'label-num';
         numero.textContent = bem.patrimonio;
 
         const descricao = document.createElement('div');
-
-        descricao.className = 'desc';
-
+        descricao.className = 'label-desc';
         descricao.textContent = bem.descricao;
 
         info.append(numero, descricao);
 
+        // QR CODE: UM ÚNICO CANVAS
 
-        // QR CODE
-
-        const qrBox = document.createElement('div');
-
-        qrBox.className = 'qr';
+        const canvas = document.createElement('canvas');
+        canvas.className = 'qr';
+        canvas.setAttribute('aria-label', 'QR Code do patrimônio ' + bem.patrimonio);
 
         const endereco =
             BASE + '?id=' + encodeURIComponent(bem.patrimonio);
 
-
         // RODAPÉ
 
         const foot = document.createElement('div');
-
-        foot.className = 'foot';
-
+        foot.className = 'label-foot';
         foot.textContent = 'ESCANEIE PARA CONSULTAR ESTE BEM';
-
 
         // MONTAGEM
 
-        body.append(info, qrBox);
-
+        body.append(info, canvas);
         card.append(head, body, foot);
 
         host.append(card);
 
-
-        // GERAÇÃO DO QR CODE
+        // GERAR QR CODE
 
         try {
 
-            new QRCode(qrBox, {
-
-                text: endereco,
-
-                width: 300,
-
-                height: 300,
-
-                colorDark: '#000000',
-
-                colorLight: '#ffffff',
-
-                correctLevel: QRCode.CorrectLevel.L
-
+            await QRCode.toCanvas(canvas, endereco, {
+                width: 400,
+                margin: 2,
+                errorCorrectionLevel: 'L',
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
             });
 
         } catch (erro) {
 
             console.error('Erro ao gerar QR Code:', erro);
 
-            qrBox.textContent = 'Erro ao gerar QR Code';
+            mensagem('Erro ao gerar QR Code do patrimônio ' + bem.patrimonio);
 
         }
 
-    });
+    }
 
 }
 
 
 /* ATUALIZAÇÃO */
 
-function render() {
+async function render() {
 
     renderList();
 
-    renderLabels();
+    await renderLabels();
 
 }
 
 
 /* ADICIONAR BEM */
 
-$('add').onclick = () => {
+$('add').onclick = async () => {
 
     const bem = {
 
@@ -726,16 +749,14 @@ $('add').onclick = () => {
     bens.push(bem);
 
     ['pat', 'desc', 'loc', 'marca', 'resp', 'obs'].forEach(id => {
-
         $(id).value = '';
-
     });
 
     $('sit').value = 'Em uso';
 
-    mensagem('Bem adicionado e QR Code gerado!');
+    mensagem('Bem adicionado e etiqueta gerada!');
 
-    render();
+    await render();
 
 };
 
@@ -745,11 +766,8 @@ $('add').onclick = () => {
 $('export').onclick = () => {
 
     const blob = new Blob(
-
         [JSON.stringify(bens, null, 2)],
-
         { type: 'application/json' }
-
     );
 
     const url = URL.createObjectURL(blob);
@@ -757,7 +775,6 @@ $('export').onclick = () => {
     const link = document.createElement('a');
 
     link.href = url;
-
     link.download = 'bens.json';
 
     link.click();
@@ -771,11 +788,7 @@ $('export').onclick = () => {
 
 /* IMPORTAR JSON */
 
-$('import').onclick = () => {
-
-    $('file').click();
-
-};
+$('import').onclick = () => $('file').click();
 
 $('file').onchange = async evento => {
 
@@ -788,32 +801,25 @@ $('file').onchange = async evento => {
         const dados = JSON.parse(await arquivo.text());
 
         if (!Array.isArray(dados)) {
-
             throw new Error('Formato inválido');
-
         }
 
         bens = dados.map(item =>
-
             Object.fromEntries(
-
                 keys.map(chave => [
-
                     chave,
-
                     trim(item[chave])
-
                 ])
-
             )
-
         );
 
-        render();
+        await render();
 
         mensagem('Base patrimonial importada com sucesso!');
 
     } catch (erro) {
+
+        console.error(erro);
 
         mensagem('Arquivo inválido. Selecione um bens.json válido.');
 
@@ -838,7 +844,7 @@ $('print').onclick = () => {
 
     if (typeof QRCode === 'undefined') {
 
-        mensagem('Não foi possível carregar a biblioteca de QR Code.');
+        mensagem('Não foi possível carregar a biblioteca QR Code.');
 
         return;
 
