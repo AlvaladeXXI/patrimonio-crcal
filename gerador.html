@@ -6,8 +6,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gerenciamento Patrimonial | CRCAL</title>
 
-
-
 <style>
 :root {
     --azul: #00417D;
@@ -16,7 +14,9 @@
     --fundo: #F5F7FA;
 }
 
-* { box-sizing: border-box; }
+* {
+    box-sizing: border-box;
+}
 
 body {
     margin: 0;
@@ -115,7 +115,9 @@ input:focus, select:focus {
     border-color: var(--azul);
 }
 
-.wide { grid-column: 1 / -1; }
+.wide {
+    grid-column: 1 / -1;
+}
 
 .actions {
     display: flex;
@@ -134,7 +136,14 @@ button {
     cursor: pointer;
 }
 
-button:hover { opacity: .9; }
+button:hover {
+    opacity: .9;
+}
+
+button:disabled {
+    opacity: .5;
+    cursor: wait;
+}
 
 button.alt {
     background: #e8edf2;
@@ -162,6 +171,8 @@ th, td {
     color: #657383;
     padding: 12px 0;
 }
+
+/* ETIQUETAS */
 
 #labels {
     display: grid;
@@ -203,7 +214,7 @@ th, td {
 }
 
 .label-logo {
-    width: 8mm;
+    width: 9mm;
     height: 7mm;
     object-fit: contain;
 }
@@ -270,19 +281,29 @@ footer {
 }
 
 @media(max-width:700px) {
-    .grid { grid-template-columns: 1fr; }
-    #labels { grid-template-columns: repeat(2, 6cm); }
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    #labels {
+        grid-template-columns: repeat(2, 6cm);
+    }
 }
 
 @media print {
+
     @page {
         size: A4 portrait;
         margin: 1cm;
     }
 
-    body { background: white; }
+    body {
+        background: white;
+    }
 
-    header, .no-print, footer {
+    header,
+    .no-print,
+    footer {
         display: none !important;
     }
 
@@ -319,6 +340,7 @@ footer {
 
 <header>
     <div class="header-content">
+
         <img
             src="./logo-crcal.jpg"
             class="logo"
@@ -331,6 +353,7 @@ footer {
             <p>Conselho Regional de Contabilidade de Alagoas</p>
             <p>Cadastro, identificação e geração de etiquetas</p>
         </div>
+
     </div>
 </header>
 
@@ -389,6 +412,7 @@ footer {
     </div>
 
     <div class="actions">
+
         <button id="add">Adicionar bem</button>
 
         <button class="alt" id="import">
@@ -409,32 +433,46 @@ footer {
         <button class="alt" id="print">
             Imprimir etiquetas A4
         </button>
+
     </div>
 
     <p class="help" id="msg" aria-live="polite"></p>
 
 </section>
 
+
 <section class="panel no-print">
+
     <h2>Bens desta sessão</h2>
+
     <div id="lista" class="empty">
         Nenhum bem adicionado.
     </div>
+
 </section>
 
+
 <section class="panel preview">
+
     <div class="no-print">
+
         <h2>Prévia das etiquetas — 6 × 4 cm</h2>
+
         <p class="help">
-            Impressão em A4, três colunas. Utilize escala de 100% / tamanho real.
+            Impressão em A4, três colunas.
+            Utilize escala de 100% / tamanho real.
         </p>
+
     </div>
 
     <div id="labels">
+
         <p class="empty no-print">
             As etiquetas aparecerão aqui.
         </p>
+
     </div>
+
 </section>
 
 </main>
@@ -443,13 +481,18 @@ footer {
     Conselho Regional de Contabilidade de Alagoas
 </footer>
 
+
 <script>
 
-/* CONFIGURAÇÕES */
+/* =====================================================
+   CONFIGURAÇÕES
+===================================================== */
 
 const BASE = 'https://alvaladexxi.github.io/patrimonio-crcal/';
 
 const CONSULTA = BASE + 'index.html';
+
+const LOGO = BASE + 'logo-crcal.jpg';
 
 const $ = id => document.getElementById(id);
 
@@ -458,6 +501,8 @@ const trim = value => String(value ?? '').trim();
 let bens = [];
 
 let renderId = 0;
+
+let processando = false;
 
 const CAMPOS = [
     'patrimonio',
@@ -470,13 +515,18 @@ const CAMPOS = [
 ];
 
 
-/* MENSAGENS */
+/* =====================================================
+   MENSAGENS
+===================================================== */
 
 function mensagem(texto) {
     $('msg').textContent = texto;
 }
 
 
+/* =====================================================
+   BIBLIOTECA QR CODE
+===================================================== */
 
 function carregarQRCode() {
 
@@ -490,7 +540,8 @@ function carregarQRCode() {
 
     const fontes = [
         'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js',
-        'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js'
+        'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
     ];
 
     window.qrLoading = new Promise((resolve, reject) => {
@@ -503,9 +554,11 @@ function carregarQRCode() {
             }
 
             if (indice >= fontes.length) {
+
                 reject(new Error(
-                    'Não foi possível carregar a biblioteca QR Code. Verifique sua conexão ou bloqueio de CDN.'
+                    'Biblioteca QR Code indisponível. Verifique sua conexão.'
                 ));
+
                 return;
             }
 
@@ -534,6 +587,7 @@ function carregarQRCode() {
     }).catch(erro => {
 
         window.qrLoading = null;
+
         throw erro;
 
     });
@@ -542,33 +596,45 @@ function carregarQRCode() {
 }
 
 
-
-/* LISTA DE BENS */
+/* =====================================================
+   LISTAGEM DOS BENS
+===================================================== */
 
 function renderList() {
 
     const host = $('lista');
+
     host.replaceChildren();
 
     if (!bens.length) {
+
         host.className = 'empty';
+
         host.textContent = 'Nenhum bem adicionado.';
+
         return;
     }
 
     host.className = '';
 
     const tabela = document.createElement('table');
+
     const thead = document.createElement('thead');
+
     const linha = document.createElement('tr');
 
     ['Patrimônio', 'Descrição', 'Localização', ''].forEach(texto => {
+
         const th = document.createElement('th');
+
         th.textContent = texto;
+
         linha.append(th);
+
     });
 
     thead.append(linha);
+
     tabela.append(thead);
 
     const tbody = document.createElement('tbody');
@@ -577,35 +643,55 @@ function renderList() {
 
         const tr = document.createElement('tr');
 
-        [bem.patrimonio, bem.descricao, bem.localizacao || '—'].forEach(valor => {
+        [
+            bem.patrimonio,
+            bem.descricao,
+            bem.localizacao || '—'
+        ].forEach(valor => {
+
             const td = document.createElement('td');
+
             td.textContent = valor;
+
             tr.append(td);
+
         });
 
         const td = document.createElement('td');
+
         const btn = document.createElement('button');
 
         btn.className = 'del';
+
         btn.textContent = 'Remover';
 
-        btn.onclick = () => {
+        btn.onclick = async () => {
+
             bens.splice(indice, 1);
-            render();
+
+            await render();
+
             mensagem('Bem removido da sessão.');
+
         };
 
         td.append(btn);
+
         tr.append(td);
+
         tbody.append(tr);
+
     });
 
     tabela.append(tbody);
+
     host.append(tabela);
 }
 
 
-/* CRIAR ETIQUETA */
+/* =====================================================
+   CRIAÇÃO DAS ETIQUETAS
+===================================================== */
 
 async function renderLabels() {
 
@@ -613,14 +699,18 @@ async function renderLabels() {
 
     const host = $('labels');
 
-    // Limpa todas as etiquetas anteriores.
     host.replaceChildren();
 
     if (!bens.length) {
+
         const p = document.createElement('p');
+
         p.className = 'empty no-print';
+
         p.textContent = 'As etiquetas aparecerão aqui.';
+
         host.append(p);
+
         return;
     }
 
@@ -628,24 +718,36 @@ async function renderLabels() {
 
     if (meuRender !== renderId) return;
 
+    // Construção em memória: evita etiquetas duplicadas
+    // ou prévias incompletas.
+
+    const fragmento = document.createDocumentFragment();
+
     for (const bem of bens) {
 
         if (meuRender !== renderId) return;
 
         const card = document.createElement('div');
+
         card.className = 'label';
+
 
         // CABEÇALHO
 
         const head = document.createElement('div');
+
         head.className = 'label-head';
 
         const brand = document.createElement('div');
+
         brand.className = 'label-brand';
 
         const logo = document.createElement('img');
-        logo.src = BASE + 'logo-crcal.jpg';
+
+        logo.src = LOGO;
+
         logo.alt = 'CRCAL';
+
         logo.className = 'label-logo';
 
         logo.onerror = () => {
@@ -653,124 +755,219 @@ async function renderLabels() {
         };
 
         const nome = document.createElement('span');
+
         nome.textContent = 'CRCAL';
 
         brand.append(logo, nome);
 
         const tipo = document.createElement('span');
+
         tipo.className = 'label-type';
+
         tipo.textContent = 'PATRIMÔNIO';
 
         head.append(brand, tipo);
 
-        // INFORMAÇÕES DO BEM
+
+        // INFORMAÇÕES
 
         const body = document.createElement('div');
+
         body.className = 'label-body';
 
         const info = document.createElement('div');
+
         info.className = 'label-info';
 
         const numero = document.createElement('div');
+
         numero.className = 'label-num';
+
         numero.textContent = bem.patrimonio;
 
         const descricao = document.createElement('div');
+
         descricao.className = 'label-desc';
+
         descricao.textContent = bem.descricao;
 
         info.append(numero, descricao);
 
-        // QR CODE ÚNICO
+
+        // QR CODE
 
         const canvas = document.createElement('canvas');
+
         canvas.className = 'qr';
 
         body.append(info, canvas);
 
+
         // RODAPÉ
 
         const foot = document.createElement('div');
+
         foot.className = 'label-foot';
+
         foot.textContent = 'ESCANEIE PARA CONSULTAR ESTE BEM';
 
         card.append(head, body, foot);
-        host.append(card);
+
+
+        // ENDEREÇO DE CONSULTA
 
         const url = CONSULTA + '?id=' +
             encodeURIComponent(bem.patrimonio);
 
+
+        // GERAÇÃO DO QR CODE
+
         await QRCode.toCanvas(canvas, url, {
+
             width: 400,
+
             margin: 3,
-            errorCorrectionLevel: 'M',
+
+            errorCorrectionLevel: 'H',
+
             color: {
                 dark: '#000000',
                 light: '#FFFFFF'
             }
+
         });
+
+        fragmento.append(card);
+
     }
+
+    if (meuRender !== renderId) return;
+
+    host.replaceChildren(fragmento);
 }
 
 
-/* RENDERIZAÇÃO GERAL */
+/* =====================================================
+   RENDERIZAÇÃO GERAL
+===================================================== */
 
 async function render() {
 
     renderList();
 
     try {
+
         await renderLabels();
+
+        return true;
+
     } catch (erro) {
-        console.error('ERRO AO GERAR ETIQUETAS:', erro);
+
+        console.error('ERRO NA GERAÇÃO DAS ETIQUETAS:', erro);
+
+        $('labels').replaceChildren();
+
+        const aviso = document.createElement('p');
+
+        aviso.className = 'empty';
+
+        aviso.textContent = 'Não foi possível gerar as etiquetas.';
+
+        $('labels').append(aviso);
+
         mensagem('Erro: ' + erro.message);
+
+        return false;
     }
 }
 
 
-/* CADASTRO */
+/* =====================================================
+   CADASTRAR BEM
+===================================================== */
 
 $('add').onclick = async () => {
 
+    if (processando) return;
+
     const bem = {
+
         patrimonio: trim($('pat').value),
+
         descricao: trim($('desc').value),
+
         localizacao: trim($('loc').value),
+
         marca_modelo: trim($('marca').value),
+
         responsavel: trim($('resp').value),
+
         situacao: $('sit').value,
+
         observacao: trim($('obs').value)
+
     };
 
     if (!bem.patrimonio || !bem.descricao) {
+
         mensagem('Informe o número patrimonial e a descrição.');
+
         return;
     }
 
     if (bens.some(x => x.patrimonio === bem.patrimonio)) {
+
         mensagem('Este número patrimonial já está cadastrado.');
+
         return;
     }
 
+    processando = true;
+
+    $('add').disabled = true;
+
     bens.push(bem);
-
-    ['pat', 'desc', 'loc', 'marca', 'resp', 'obs'].forEach(id => {
-        $(id).value = '';
-    });
-
-    $('sit').value = 'Em uso';
 
     mensagem('Gerando etiqueta...');
 
-    await render();
+    const sucesso = await render();
 
-    mensagem('Bem adicionado e etiqueta gerada com sucesso!');
+    if (sucesso) {
+
+        ['pat', 'desc', 'loc', 'marca', 'resp', 'obs'].forEach(id => {
+            $(id).value = '';
+        });
+
+        $('sit').value = 'Em uso';
+
+        mensagem('Bem adicionado e etiqueta gerada com sucesso!');
+
+    } else {
+
+        mensagem(
+            'Bem adicionado à sessão, mas a etiqueta não foi gerada. Verifique a conexão.'
+        );
+
+    }
+
+    processando = false;
+
+    $('add').disabled = false;
 };
 
 
-/* EXPORTAR BASE */
+/* =====================================================
+   EXPORTAR BENS.JSON
+===================================================== */
 
 $('export').onclick = () => {
+
+    if (!bens.length) {
+
+        mensagem('Não existem bens para exportar.');
+
+        return;
+    }
 
     const blob = new Blob(
         [JSON.stringify(bens, null, 2)],
@@ -780,11 +977,15 @@ $('export').onclick = () => {
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a');
+
     a.href = url;
+
     a.download = 'bens.json';
 
     document.body.append(a);
+
     a.click();
+
     a.remove();
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -795,7 +996,9 @@ $('export').onclick = () => {
 };
 
 
-/* IMPORTAR BASE */
+/* =====================================================
+   IMPORTAR BENS.JSON
+===================================================== */
 
 $('import').onclick = () => $('file').click();
 
@@ -810,7 +1013,9 @@ $('file').onchange = async event => {
         const dados = JSON.parse(await arquivo.text());
 
         if (!Array.isArray(dados)) {
+
             throw new Error('O arquivo não contém uma lista de bens.');
+
         }
 
         const importados = dados.map(item => {
@@ -818,33 +1023,50 @@ $('file').onchange = async event => {
             const bem = {};
 
             CAMPOS.forEach(campo => {
+
                 bem[campo] = trim(item[campo]);
+
             });
 
             bem.situacao = bem.situacao || 'Em uso';
 
             return bem;
+
         });
 
         if (importados.some(b => !b.patrimonio || !b.descricao)) {
-            throw new Error('Há bens sem número patrimonial ou descrição.');
+
+            throw new Error(
+                'Existem bens sem número patrimonial ou descrição.'
+            );
+
         }
 
         const numeros = importados.map(b => b.patrimonio);
 
         if (new Set(numeros).size !== numeros.length) {
+
             throw new Error('Existem números patrimoniais duplicados.');
+
         }
 
         bens = importados;
 
-        await render();
+        const sucesso = await render();
 
-        mensagem('Base patrimonial importada com sucesso!');
+        if (sucesso) {
+
+            mensagem(
+                bens.length + ' bem(ns) importado(s) com sucesso!'
+            );
+
+        }
 
     } catch (erro) {
 
         mensagem('Erro na importação: ' + erro.message);
+
+        console.error(erro);
 
     }
 
@@ -852,36 +1074,39 @@ $('file').onchange = async event => {
 };
 
 
-/* IMPRESSÃO */
+/* =====================================================
+   IMPRESSÃO
+===================================================== */
 
 $('print').onclick = async () => {
 
     if (!bens.length) {
+
         mensagem('Adicione ou importe pelo menos um bem.');
+
         return;
     }
 
-    try {
+    mensagem('Preparando etiquetas para impressão...');
 
-        mensagem('Preparando etiquetas para impressão...');
+    const sucesso = await render();
 
-        await renderLabels();
+    if (!sucesso) {
 
-        window.print();
+        mensagem('Impressão cancelada: não foi possível gerar os QR Codes.');
 
-        mensagem('Impressão preparada.');
-
-    } catch (erro) {
-
-        console.error('ERRO NA IMPRESSÃO:', erro);
-         
-        mensagem('Erro na impressão: ' + erro.message);
-
+        return;
     }
+
+    window.print();
+
+    mensagem('Etiquetas preparadas para impressão.');
 };
 
 
-/* INICIALIZAÇÃO */
+/* =====================================================
+   INICIALIZAÇÃO
+===================================================== */
 
 render();
 
