@@ -1,1131 +1,180 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gerenciamento Patrimonial | CRCAL</title>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
 <style>
-:root {
-    --azul: #00417D;
-    --azul-escuro: #283656;
-    --dourado: #B29448;
-    --fundo: #F5F7FA;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font: 14px Arial, sans-serif;
-    background: var(--fundo);
-    color: #17212b;
-}
-
-header {
-    background: white;
-    padding: 15px 20px;
-    border-bottom: 3px solid var(--dourado);
-}
-
-.header-content {
-    max-width: 1100px;
-    margin: auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.logo {
-    width: 65px;
-    height: 55px;
-    object-fit: contain;
-}
-
-.header-title {
-    border-left: 3px solid var(--dourado);
-    padding-left: 15px;
-}
-
-.header-title h1 {
-    font-size: 20px;
-    color: var(--azul);
-    margin: 0 0 5px;
-}
-
-.header-title p {
-    font-size: 12px;
-    color: #657383;
-    margin: 3px 0;
-}
-
-main {
-    max-width: 1100px;
-    margin: auto;
-    padding: 24px 16px;
-}
-
-.panel {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    margin-bottom: 18px;
-    box-shadow: 0 3px 14px #14283d12;
-}
-
-h2 {
-    color: var(--azul);
-    font-size: 21px;
-    margin: 0 0 9px;
-}
-
-.help {
-    color: #657383;
-    font-size: 13px;
-    line-height: 1.5;
-}
-
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 13px;
-}
-
-label {
-    display: block;
-    font-size: 12px;
-    font-weight: bold;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 11px;
-    border: 1px solid #cbd5df;
-    border-radius: 7px;
-    background: white;
-    font-size: 14px;
-}
-
-.wide {
-    grid-column: 1 / -1;
-}
-
-.actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 9px;
-    margin-top: 16px;
-}
-
-button {
-    border: 0;
-    border-radius: 7px;
-    padding: 11px 15px;
-    background: var(--azul);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-button:disabled {
-    opacity: .5;
-    cursor: wait;
-}
-
-button.alt {
-    background: #e8edf2;
-    color: var(--azul);
-}
-
-button.del {
-    background: #fff0ef;
-    color: #a51b18;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-
-th, td {
-    text-align: left;
-    padding: 10px;
-    border-bottom: 1px solid #e8edf2;
-}
-
-.empty {
-    color: #657383;
-    padding: 12px 0;
-}
-
-/* ETIQUETAS */
-
-#labels {
-    display: grid;
-    grid-template-columns: repeat(3, 6cm);
-    justify-content: start;
-    gap: 0;
-}
-
-.label {
-    width: 6cm;
-    height: 4cm;
-    padding: 2.5mm;
-    border: 1px dashed #b8c2cc;
-    background: white;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden;
-    break-inside: avoid;
-    page-break-inside: avoid;
-}
-
-.label-head {
-    height: 8mm;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--dourado);
-    padding-bottom: 1mm;
-}
-
-.label-brand {
-    display: flex;
-    align-items: center;
-    gap: 1.5mm;
-    color: var(--azul);
-    font-size: 8pt;
-    font-weight: bold;
-}
-
-.label-logo {
-    width: 9mm;
-    height: 7mm;
-    object-fit: contain;
-}
-
-.label-type {
-    color: var(--azul);
-    font-size: 7pt;
-    font-weight: bold;
-}
-
-.label-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2mm;
-    flex: 1;
-    min-height: 0;
-}
-
-.label-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.label-num {
-    color: var(--azul);
-    font-size: 19pt;
-    font-weight: 800;
-    line-height: 1.1;
-    overflow-wrap: anywhere;
-}
-
-.label-desc {
-    font-size: 7.5pt;
-    font-weight: bold;
-    line-height: 1.2;
-    margin-top: 1.5mm;
-    max-height: 10mm;
-    overflow: hidden;
-    overflow-wrap: anywhere;
-}
-
-.qr {
-    width: 20mm;
-    height: 20mm;
-    flex: 0 0 20mm;
-    display: block;
-    object-fit: contain;
-    background: white;
-}
-
-.label-foot {
-    text-align: center;
-    font-size: 6.5pt;
-    color: var(--azul);
-    border-top: 1px solid #dce3ea;
-    padding-top: 1mm;
-}
-
-footer {
-    text-align: center;
-    color: #84909d;
-    font-size: 11px;
-    padding: 15px;
-}
-
-@media(max-width:700px) {
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    #labels {
-        grid-template-columns: repeat(2, 6cm);
-    }
-}
-
-@media print {
-    @page {
-        size: A4 portrait;
-        margin: 1cm;
-    }
-
-    body {
-        background: white;
-    }
-
-    header,
-    .no-print,
-    footer {
-        display: none !important;
-    }
-
-    main {
-        margin: 0;
-        padding: 0;
-        max-width: none;
-    }
-
-    .panel.preview {
-        padding: 0;
-        box-shadow: none;
-        margin: 0;
-    }
-
-    #labels {
-        grid-template-columns: repeat(3, 6cm);
-        gap: 0;
-    }
-
-    .label {
-        border: 1px solid #ddd;
-    }
-
-    .qr {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-    }
-}
+:root{--azul:#00417D;--escuro:#283656;--ouro:#B29448;--fundo:#F5F7FA}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:var(--fundo);color:#17212b}
+header{background:#fff;padding:20px;border-bottom:3px solid var(--ouro)}.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+h1{font-size:21px;color:var(--azul);margin:0 0 5px}.sub{color:#657383;font-size:12px;margin:0}
+main{max-width:1150px;margin:24px auto;padding:0 16px}.panel{background:#fff;padding:20px;border-radius:12px;margin-bottom:18px;box-shadow:0 3px 14px #14283d12}
+h2{color:var(--azul);font-size:19px;margin:0 0 12px}.muted{color:#657383;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-weight:bold;font-size:12px;margin:0 0 5px}input,select{width:100%;padding:11px;border:1px solid #cbd5df;border-radius:7px;font-size:14px;background:#fff}
+.wide{grid-column:1/-1}.actions,.tabs{display:flex;flex-wrap:wrap;gap:9px;margin-top:15px}
+button{border:0;border-radius:7px;padding:10px 14px;background:var(--azul);color:#fff;font-weight:bold;cursor:pointer}button.alt{background:#e8edf2;color:var(--azul)}button.danger{background:#fff0ef;color:#a51b18}button:disabled{opacity:.5;cursor:not-allowed}
+.tab.active{background:var(--escuro)}.hidden{display:none!important}.notice{margin-top:12px;color:var(--azul);min-height:18px}.error{color:#a51b18}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}td,th{text-align:left;padding:10px;border-bottom:1px solid #e8edf2;vertical-align:top}th{color:var(--azul)}
+.searchrow{display:flex;gap:10px;align-items:center;margin-top:12px}.searchrow input{max-width:460px}
+.pager{display:flex;align-items:center;gap:12px;margin-top:12px}.pager span{color:#657383}
+.checkcell{width:35px}.label-grid{display:grid;grid-template-columns:repeat(3,6cm);gap:0;margin-top:15px}
+.label{width:6cm;height:4cm;border:1px solid #d5dce4;padding:3mm;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;background:#fff;break-inside:avoid}
+.label-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dce3ea;padding-bottom:1mm}
+.label-brand{display:flex;align-items:center;gap:5px;font-weight:bold;color:var(--azul);font-size:8pt}.label-logo{width:9mm;height:9mm;object-fit:contain}
+.label-type{font-size:6.5pt;color:var(--ouro);font-weight:bold}.label-body{display:flex;align-items:center;justify-content:space-between;gap:2mm;flex:1;min-height:0}
+.label-info{min-width:0;flex:1}.label-num{font-size:12pt;font-weight:bold;color:var(--azul);overflow-wrap:anywhere}.label-desc{font-size:7pt;line-height:1.2;max-height:18mm;overflow:hidden}
+.qr{width:25mm;height:25mm;flex:0 0 25mm}.label-foot{text-align:center;font-size:6pt;border-top:1px solid #dce3ea;padding-top:1mm;color:var(--azul)}
+#login{max-width:430px;margin:50px auto}.login-logo{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 15px}
+footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column;align-items:stretch}.label-grid{grid-template-columns:repeat(2,6cm)}table{display:block;overflow-x:auto}}
+@media print{@page{size:A4 portrait;margin:1cm}body{background:#fff}header,.no-print,footer{display:none!important}main{margin:0;padding:0;max-width:none}.panel{padding:0;margin:0;box-shadow:none}#labels{display:grid!important;grid-template-columns:repeat(3,6cm);gap:0}.label{border:1px solid #ddd}.qr{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
-
 <body>
-
-<header>
-    <div class="header-content">
-
-        <img
-            src="./logo-crcal.jpg"
-            class="logo"
-            alt="Logo CRCAL"
-            onerror="this.style.display='none'"
-        >
-
-        <div class="header-title">
-            <h1>GERENCIAMENTO PATRIMONIAL</h1>
-            <p>Conselho Regional de Contabilidade de Alagoas</p>
-            <p>Cadastro, identificação e geração de etiquetas</p>
-        </div>
-
-    </div>
-</header>
-
+<header class="no-print"><div class="head"><div><h1>GERENCIAMENTO PATRIMONIAL</h1><p class="sub">Conselho Regional de Contabilidade de Alagoas</p><p class="sub">Cadastro, consulta e identificação de bens</p></div><button id="logout" class="alt hidden">Sair</button></div></header>
 <main>
-
-<section class="panel no-print">
-
-    <h2>Cadastrar bem e gerar etiqueta</h2>
-
-    <p class="help">
-        Cadastre os bens, gere os QR Codes e exporte a base patrimonial.
-    </p>
-
-    <div class="grid">
-
-        <div>
-            <label>Número patrimonial *</label>
-            <input id="pat" placeholder="Ex.: 001258">
-        </div>
-
-        <div>
-            <label>Situação</label>
-            <select id="sit">
-                <option>Em uso</option>
-                <option>Em estoque</option>
-                <option>Em manutenção</option>
-                <option>Baixado</option>
-            </select>
-        </div>
-
-        <div class="wide">
-            <label>Descrição *</label>
-            <input id="desc" placeholder="Ex.: Computador Dell OptiPlex">
-        </div>
-
-        <div>
-            <label>Localização</label>
-            <input id="loc" placeholder="Ex.: Departamento de Cobrança">
-        </div>
-
-        <div>
-            <label>Marca / modelo</label>
-            <input id="marca" placeholder="Ex.: Dell OptiPlex">
-        </div>
-
-        <div>
-            <label>Responsável / setor</label>
-            <input id="resp" placeholder="Ex.: DECOB">
-        </div>
-
-        <div>
-            <label>Observação pública</label>
-            <input id="obs" placeholder="Opcional">
-        </div>
-
-    </div>
-
-    <div class="actions">
-
-        <button id="add">Adicionar bem</button>
-
-        <button class="alt" id="import">
-            Importar bens.json
-        </button>
-
-        <input
-            id="file"
-            type="file"
-            accept=".json,application/json"
-            hidden
-        >
-
-        <button class="alt" id="export">
-            Baixar bens.json
-        </button>
-
-        <button class="alt" id="print">
-            Imprimir etiquetas A4
-        </button>
-
-    </div>
-
-    <p class="help" id="msg" aria-live="polite">Carregando a base patrimonial...</p>
-
+<section id="login" class="panel no-print">
+<img class="login-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="CRCAL">
+<h2>Acesso administrativo</h2><p class="muted">Entre com seu usuário autorizado para gerenciar os bens patrimoniais.</p>
+<label for="email">E-mail</label><input id="email" type="email" autocomplete="username">
+<label for="password" style="margin-top:12px">Senha</label><input id="password" type="password" autocomplete="current-password">
+<div class="actions"><button id="loginBtn">Entrar</button></div><p id="loginMsg" class="notice" aria-live="polite"></p>
 </section>
-
-
-<section class="panel no-print">
-
-    <h2>Bens desta sessão</h2>
-
-    <div id="lista" class="empty">
-        Nenhum bem adicionado.
-    </div>
-
+<section id="admin" class="hidden">
+<nav class="tabs no-print">
+<button class="tab active" data-tab="cadastro">Cadastrar bem</button>
+<button class="tab alt" data-tab="bens">Bens cadastrados</button>
+<button class="tab alt" data-tab="etiquetas">Etiquetas</button>
+</nav>
+<section id="tab-cadastro" class="panel no-print">
+<h2 id="formTitle">Cadastrar novo bem</h2><p class="muted">Os dados são gravados diretamente na base patrimonial.</p>
+<div class="grid">
+<div><label for="pat">Número patrimonial *</label><input id="pat" placeholder="Ex.: 001258"></div>
+<div><label for="sit">Situação</label><select id="sit"><option>Em uso</option><option>Em estoque</option><option>Em manutenção</option><option>Baixado</option></select></div>
+<div class="wide"><label for="desc">Descrição *</label><input id="desc" placeholder="Ex.: Computador Dell OptiPlex"></div>
+<div><label for="loc">Localização</label><input id="loc" placeholder="Ex.: Departamento de Cobrança"></div>
+<div><label for="marca">Marca / modelo</label><input id="marca" placeholder="Ex.: Dell OptiPlex"></div>
+<div><label for="resp">Responsável / setor</label><input id="resp" placeholder="Ex.: DECOB"></div>
+<div><label for="obs">Observação</label><input id="obs" placeholder="Informação interna"></div>
+</div>
+<div class="actions"><button id="saveBtn">Salvar bem</button><button id="cancelEdit" class="alt hidden">Cancelar edição</button></div><p id="formMsg" class="notice" aria-live="polite"></p>
 </section>
-
-
-<section class="panel preview">
-
-    <div class="no-print">
-
-        <h2>Prévia das etiquetas — 6 × 4 cm</h2>
-
-        <p class="help">
-            Impressão em A4, três colunas.
-            Utilize escala de 100% / tamanho real.
-        </p>
-
-    </div>
-
-    <div id="labels">
-        <p class="empty no-print">As etiquetas aparecerão aqui.</p>
-    </div>
-
+<section id="tab-bens" class="panel hidden no-print">
+<h2>Bens cadastrados</h2><p class="muted">Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.</p>
+<div class="searchrow"><input id="searchBens" placeholder="Pesquisar bens..."><button id="refresh" class="alt">Atualizar</button></div>
+<div id="listHost"></div><div class="pager"><button id="prev" class="alt">Anterior</button><span id="pageInfo"></span><button id="next" class="alt">Próxima</button></div>
 </section>
-
-</main>
-
-<footer>
-    Conselho Regional de Contabilidade de Alagoas
-</footer>
-
-
+<section id="tab-etiquetas" class="panel no-print hidden">
+<h2>Gerar etiquetas</h2><p class="muted">Selecione somente os bens que deseja imprimir. As etiquetas são geradas sob demanda, no formato 6 × 4 cm.</p>
+<div class="searchrow"><input id="searchLabels" placeholder="Filtrar por patrimônio ou descrição..."><button id="selectVisible" class="alt">Selecionar exibidos</button><button id="clearSelection" class="alt">Limpar seleção</button></div>
+<div id="labelChoices"></div><div class="actions"><button id="generateLabels">Gerar etiquetas selecionadas</button><button id="printLabels" class="alt" disabled>Imprimir A4</button></div><p id="labelMsg" class="notice"></p>
+</section>
+<section class="panel hidden" id="labelPreview"><div class="no-print"><h2>Prévia das etiquetas — 6 × 4 cm</h2><p class="muted">Na impressão, selecione tamanho real ou escala de 100%.</p></div><div id="labels" class="label-grid"></div></section>
+</section>
+</main><footer>Conselho Regional de Contabilidade de Alagoas</footer>
 <script>
-
-/* ==========================================
-   CONFIGURAÇÕES
-========================================== */
-
+const SUPABASE_URL = 'https://zgjzqusqssytxqcsykst.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_oQQaUnbIwBzmDh4HPbu4Eg_UYV1tUvJ';
 const BASE = 'https://alvaladexxi.github.io/patrimonio-crcal/';
-
-const CONSULTA = BASE + 'index.html';
-
 const LOGO = BASE + 'logo-crcal.jpg';
-
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
-
-const trim = value => String(value ?? '').trim();
-
-const CAMPOS = [
-    'patrimonio',
-    'descricao',
-    'localizacao',
-    'marca_modelo',
-    'responsavel',
-    'situacao',
-    'observacao'
-];
-
-let bens = [];
-
-let renderId = 0;
-
-let processando = false;
-
-// Só permite cadastrar quando a base atual estiver carregada
-// ou quando uma importação válida tiver sido realizada.
-let baseCarregada = false;
-
-
-/* ==========================================
-   MENSAGENS
-========================================== */
-
-function mensagem(texto) {
-    $('msg').textContent = texto;
+const clean = v => String(v ?? '').trim();
+let bens = [], page = 1, editingId = null;
+const PAGE_SIZE = 15, selected = new Set();
+function say(id, msg, error=false){$(id).textContent=msg;$(id).classList.toggle('error',error)}
+function showTab(name){
+ document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===name);b.classList.toggle('alt',b.dataset.tab!==name)});
+ ['cadastro','bens','etiquetas'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==name));
+ if(name==='bens') renderList(); if(name==='etiquetas') renderChoices();
 }
-
-
-/* ==========================================
-   GERAÇÃO DE QR CODE POR IMAGEM
-========================================== */
-
-function criarQRCode(patrimonio) {
-
-    const urlConsulta =
-        CONSULTA + '?id=' + encodeURIComponent(patrimonio);
-
-    const urlQR =
-        'https://api.qrserver.com/v1/create-qr-code/' +
-        '?size=400x400' +
-        '&format=png' +
-        '&ecc=H' +
-        '&margin=10' +
-        '&data=' + encodeURIComponent(urlConsulta);
-
-    const img = document.createElement('img');
-
-    img.className = 'qr';
-
-    img.alt = 'QR Code do patrimônio ' + patrimonio;
-
-    img.loading = 'eager';
-
-    img.src = urlQR;
-
-    return new Promise((resolve, reject) => {
-
-        img.onload = () => resolve(img);
-
-        img.onerror = () => reject(
-            new Error(
-                'Não foi possível carregar o QR Code do patrimônio ' +
-                patrimonio
-            )
-        );
-
-    });
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+async function loadBens(){
+ say('formMsg','Carregando dados...');
+ const {data,error}=await db.from('bens_patrimoniais').select('*').order('patrimonio',{ascending:true});
+ if(error){say('formMsg','Erro ao carregar: '+error.message,true);return}
+ bens=data||[];renderList();renderChoices();say('formMsg','');
 }
-
-
-/* ==========================================
-   LISTAGEM DOS BENS
-========================================== */
-
-function renderList() {
-
-    const host = $('lista');
-
-    host.replaceChildren();
-
-    if (!bens.length) {
-
-        host.className = 'empty';
-
-        host.textContent = 'Nenhum bem adicionado.';
-
-        return;
-    }
-
-    host.className = '';
-
-    const tabela = document.createElement('table');
-
-    const thead = document.createElement('thead');
-
-    const linha = document.createElement('tr');
-
-    ['Patrimônio', 'Descrição', 'Localização', ''].forEach(texto => {
-
-        const th = document.createElement('th');
-
-        th.textContent = texto;
-
-        linha.append(th);
-
-    });
-
-    thead.append(linha);
-
-    tabela.append(thead);
-
-    const tbody = document.createElement('tbody');
-
-    bens.forEach((bem, indice) => {
-
-        const tr = document.createElement('tr');
-
-        [
-            bem.patrimonio,
-            bem.descricao,
-            bem.localizacao || '—'
-        ].forEach(valor => {
-
-            const td = document.createElement('td');
-
-            td.textContent = valor;
-
-            tr.append(td);
-
-        });
-
-        const td = document.createElement('td');
-
-        const btn = document.createElement('button');
-
-        btn.className = 'del';
-
-        btn.textContent = 'Remover';
-
-        btn.onclick = async () => {
-
-            bens.splice(indice, 1);
-
-            await render();
-
-            mensagem('Bem removido da sessão.');
-
-        };
-
-        td.append(btn);
-
-        tr.append(td);
-
-        tbody.append(tr);
-
-    });
-
-    tabela.append(tbody);
-
-    host.append(tabela);
+function resetForm(){
+ editingId=null;['pat','desc','loc','marca','resp','obs'].forEach(id=>$(id).value='');$('sit').value='Em uso';
+ $('formTitle').textContent='Cadastrar novo bem';$('saveBtn').textContent='Salvar bem';$('cancelEdit').classList.add('hidden');
 }
-
-
-/* ==========================================
-   CRIAÇÃO DAS ETIQUETAS
-========================================== */
-
-async function renderLabels() {
-
-    const meuRender = ++renderId;
-
-    const host = $('labels');
-
-    host.replaceChildren();
-
-    if (!bens.length) {
-
-        const p = document.createElement('p');
-
-        p.className = 'empty no-print';
-
-        p.textContent = 'As etiquetas aparecerão aqui.';
-
-        host.append(p);
-
-        return;
-    }
-
-    const fragmento = document.createDocumentFragment();
-
-    for (const bem of bens) {
-
-        if (meuRender !== renderId) return;
-
-        const card = document.createElement('div');
-
-        card.className = 'label';
-
-        // CABEÇALHO
-
-        const head = document.createElement('div');
-
-        head.className = 'label-head';
-
-        const brand = document.createElement('div');
-
-        brand.className = 'label-brand';
-
-        const logo = document.createElement('img');
-
-        logo.src = LOGO;
-
-        logo.alt = 'CRCAL';
-
-        logo.className = 'label-logo';
-
-        logo.onerror = () => {
-            logo.style.display = 'none';
-        };
-
-        const nome = document.createElement('span');
-
-        nome.textContent = 'CRCAL';
-
-        brand.append(logo, nome);
-
-        const tipo = document.createElement('span');
-
-        tipo.className = 'label-type';
-
-        tipo.textContent = 'PATRIMÔNIO';
-
-        head.append(brand, tipo);
-
-
-        // INFORMAÇÕES
-
-        const body = document.createElement('div');
-
-        body.className = 'label-body';
-
-        const info = document.createElement('div');
-
-        info.className = 'label-info';
-
-        const numero = document.createElement('div');
-
-        numero.className = 'label-num';
-
-        numero.textContent = bem.patrimonio;
-
-        const descricao = document.createElement('div');
-
-        descricao.className = 'label-desc';
-
-        descricao.textContent = bem.descricao;
-
-        info.append(numero, descricao);
-
-
-        // QR CODE
-
-        const qr = await criarQRCode(bem.patrimonio);
-
-        if (meuRender !== renderId) return;
-
-        body.append(info, qr);
-
-
-        // RODAPÉ
-
-        const foot = document.createElement('div');
-
-        foot.className = 'label-foot';
-
-        foot.textContent = 'ESCANEIE PARA CONSULTAR ESTE BEM';
-
-        card.append(head, body, foot);
-
-        fragmento.append(card);
-
-    }
-
-    if (meuRender !== renderId) return;
-
-    host.replaceChildren(fragmento);
+function beginEdit(b){
+ editingId=b.id;$('pat').value=b.patrimonio||'';$('desc').value=b.descricao||'';$('loc').value=b.localizacao||'';
+ $('marca').value=b.marca_modelo||'';$('resp').value=b.responsavel||'';$('obs').value=b.observacao||'';$('sit').value=b.situacao||'Em uso';
+ $('formTitle').textContent='Editar bem patrimonial';$('saveBtn').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');
+ showTab('cadastro');window.scrollTo({top:0,behavior:'smooth'});
 }
-
-
-/* ==========================================
-   RENDERIZAÇÃO GERAL
-========================================== */
-
-async function render() {
-
-    renderList();
-
-    try {
-
-        await renderLabels();
-
-        return true;
-
-    } catch (erro) {
-
-        console.error('Erro na geração:', erro);
-
-        $('labels').replaceChildren();
-
-        const aviso = document.createElement('p');
-
-        aviso.className = 'empty';
-
-        aviso.textContent = 'Não foi possível gerar as etiquetas.';
-
-        $('labels').append(aviso);
-
-        mensagem('Erro: ' + erro.message);
-
-        return false;
-    }
-}
-
-
-/* ==========================================
-   CADASTRAR BEM
-========================================== */
-
-$('add').onclick = async () => {
-
-    if (processando) return;
-
-    if (!baseCarregada) {
-        mensagem('A base patrimonial ainda não foi carregada. Verifique sua conexão ou importe um bens.json atualizado.');
-        return;
-    }
-
-    const bem = {
-
-        patrimonio: trim($('pat').value),
-
-        descricao: trim($('desc').value),
-
-        localizacao: trim($('loc').value),
-
-        marca_modelo: trim($('marca').value),
-
-        responsavel: trim($('resp').value),
-
-        situacao: $('sit').value,
-
-        observacao: trim($('obs').value)
-
-    };
-
-    if (!bem.patrimonio || !bem.descricao) {
-
-        mensagem('Informe o número patrimonial e a descrição.');
-
-        return;
-    }
-
-    if (bens.some(x => x.patrimonio === bem.patrimonio)) {
-
-        mensagem('Este número patrimonial já está cadastrado.');
-
-        return;
-    }
-
-    processando = true;
-
-    $('add').disabled = true;
-
-    bens.push(bem);
-
-    mensagem('Gerando etiqueta...');
-
-    const sucesso = await render();
-
-    if (sucesso) {
-
-        ['pat', 'desc', 'loc', 'marca', 'resp', 'obs'].forEach(id => {
-            $(id).value = '';
-        });
-
-        $('sit').value = 'Em uso';
-
-        mensagem('Bem adicionado e etiqueta gerada com sucesso!');
-
-    } else {
-
-        mensagem(
-            'Bem cadastrado na sessão, mas houve falha na geração do QR Code.'
-        );
-
-    }
-
-    processando = false;
-
-    $('add').disabled = false;
+$('cancelEdit').onclick=()=>{resetForm();say('formMsg','Edição cancelada.')};
+$('saveBtn').onclick=async()=>{
+ const b={patrimonio:clean($('pat').value),descricao:clean($('desc').value),localizacao:clean($('loc').value),
+ marca_modelo:clean($('marca').value),responsavel:clean($('resp').value),situacao:$('sit').value,observacao:clean($('obs').value)};
+ if(!b.patrimonio||!b.descricao){say('formMsg','Informe o número patrimonial e a descrição.',true);return}
+ $('saveBtn').disabled=true;say('formMsg','Salvando...');
+ let result=editingId?await db.from('bens_patrimoniais').update(b).eq('id',editingId):await db.from('bens_patrimoniais').insert(b);
+ $('saveBtn').disabled=false;
+ if(result.error){say('formMsg','Não foi possível salvar: '+(result.error.code==='23505'?'Esse número patrimonial já está cadastrado.':result.error.message),true);return}
+ resetForm();say('formMsg','Bem salvo com sucesso.');await loadBens();
 };
-
-
-/* ==========================================
-   EXPORTAR BENS.JSON
-========================================== */
-
-$('export').onclick = () => {
-
-    if (!bens.length) {
-
-        mensagem('Não existem bens para exportar.');
-
-        return;
-    }
-
-    const blob = new Blob(
-        [JSON.stringify(bens, null, 2)],
-        { type: 'application/json' }
-    );
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-
-    a.href = url;
-
-    a.download = 'bens.json';
-
-    document.body.append(a);
-
-    a.click();
-
-    a.remove();
-
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-    mensagem('Arquivo bens.json baixado com sucesso.');
-};
-
-
-/* ==========================================
-   IMPORTAR BENS.JSON
-========================================== */
-
-$('import').onclick = () => $('file').click();
-
-$('file').onchange = async event => {
-
-    const arquivo = event.target.files[0];
-
-    if (!arquivo) return;
-
-    try {
-
-        const dados = JSON.parse(await arquivo.text());
-
-        if (!Array.isArray(dados)) {
-
-            throw new Error('O arquivo não contém uma lista de bens.');
-
-        }
-
-        const importados = dados.map(item => {
-
-            const bem = {};
-
-            CAMPOS.forEach(campo => {
-
-                bem[campo] = trim(item[campo]);
-
-            });
-
-            bem.situacao = bem.situacao || 'Em uso';
-
-            return bem;
-
-        });
-
-        if (importados.some(b => !b.patrimonio || !b.descricao)) {
-
-            throw new Error(
-                'Existem bens sem número patrimonial ou descrição.'
-            );
-
-        }
-
-        const numeros = importados.map(b => b.patrimonio);
-
-        if (new Set(numeros).size !== numeros.length) {
-
-            throw new Error('Existem números patrimoniais duplicados.');
-
-        }
-
-        const anterior = bens;
-        const estadoAnterior = baseCarregada;
-
-        bens = importados;
-
-        const sucesso = await render();
-
-        if (sucesso) {
-            baseCarregada = true;
-
-            mensagem(
-                bens.length + ' bem(ns) importado(s) com sucesso! A base está pronta para uso.'
-            );
-
-        } else {
-
-            bens = anterior;
-            baseCarregada = estadoAnterior;
-
-            await render();
-
-        }
-
-    } catch (erro) {
-
-        mensagem('Erro na importação: ' + erro.message);
-
-        console.error(erro);
-
-    }
-
-    event.target.value = '';
-};
-
-
-/* ==========================================
-   IMPRESSÃO
-========================================== */
-
-$('print').onclick = async () => {
-
-    if (!bens.length) {
-
-        mensagem('Adicione ou importe pelo menos um bem.');
-
-        return;
-    }
-
-    mensagem('Preparando etiquetas para impressão...');
-
-    const sucesso = await render();
-
-    if (!sucesso) {
-
-        mensagem('Impressão cancelada. Verifique a conexão.');
-
-        return;
-    }
-
-    window.print();
-
-    mensagem('Etiquetas preparadas para impressão.');
-};
-
-
-/* ==========================================
-   CARREGAR BASE PUBLICADA AUTOMATICAMENTE
-========================================== */
-
-async function carregarBaseInicial() {
-    const botaoAdicionar = $('add');
-
-    botaoAdicionar.disabled = true;
-    mensagem('Buscando automaticamente a base patrimonial publicada...');
-
-    try {
-        const resposta = await fetch(BASE + 'bens.json?atualizacao=' + Date.now(), {
-            method: 'GET',
-            cache: 'no-store'
-        });
-
-        if (!resposta.ok) {
-            throw new Error('O arquivo bens.json não foi encontrado ou não pôde ser acessado (HTTP ' + resposta.status + ').');
-        }
-
-        const dados = await resposta.json();
-
-        if (!Array.isArray(dados)) {
-            throw new Error('O arquivo bens.json não contém uma lista válida de bens.');
-        }
-
-        const importados = dados.map(item => {
-            const bem = {};
-
-            CAMPOS.forEach(campo => {
-                bem[campo] = trim(item[campo]);
-            });
-
-            bem.situacao = bem.situacao || 'Em uso';
-            return bem;
-        });
-
-        if (importados.some(b => !b.patrimonio || !b.descricao)) {
-            throw new Error('A base publicada contém bem sem número patrimonial ou descrição.');
-        }
-
-        const numeros = importados.map(b => b.patrimonio);
-
-        if (new Set(numeros).size !== numeros.length) {
-            throw new Error('A base publicada contém números patrimoniais duplicados.');
-        }
-
-        bens = importados;
-        baseCarregada = true;
-
-        const sucesso = await render();
-
-        if (!sucesso) {
-            throw new Error('A base foi carregada, mas houve uma falha ao montar as etiquetas.');
-        }
-
-        mensagem(bens.length + ' bem(ns) carregado(s) automaticamente. Você já pode cadastrar novos bens.');
-
-    } catch (erro) {
-        console.error('Falha ao carregar a base patrimonial:', erro);
-
-        bens = [];
-        baseCarregada = false;
-        await render();
-
-        mensagem('Não foi possível carregar a base automaticamente: ' + erro.message + ' Confira se o bens.json está publicado na raiz do site ou importe o arquivo manualmente.');
-    } finally {
-        botaoAdicionar.disabled = false;
-    }
+function filteredBens(q){q=clean(q).toLocaleLowerCase('pt-BR');return bens.filter(b=>!q||[b.patrimonio,b.descricao,b.localizacao].some(v=>clean(v).toLocaleLowerCase('pt-BR').includes(q)))}
+function renderList(){
+ const host=$('listHost'),arr=filteredBens($('searchBens').value),pages=Math.max(1,Math.ceil(arr.length/PAGE_SIZE));page=Math.min(page,pages);
+ const slice=arr.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+ if(!slice.length){host.textContent='Nenhum bem encontrado.';$('pageInfo').textContent='0 registros';return}
+ const table=document.createElement('table'),thead=document.createElement('thead'),trh=document.createElement('tr');
+ ['Patrimônio','Descrição','Localização','Situação','Ações'].forEach(x=>{const th=document.createElement('th');th.textContent=x;trh.append(th)});thead.append(trh);table.append(thead);
+ const tbody=document.createElement('tbody');
+ slice.forEach(b=>{const tr=document.createElement('tr');[b.patrimonio,b.descricao,b.localizacao||'—',b.situacao||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});
+ const td=document.createElement('td'),edit=document.createElement('button');edit.textContent='Editar';edit.className='alt';edit.onclick=()=>beginEdit(b);
+ const del=document.createElement('button');del.textContent='Excluir';del.className='danger';del.style.marginLeft='5px';del.onclick=async()=>{if(!confirm('Excluir o bem '+b.patrimonio+'? Esta ação não pode ser desfeita.'))return;const {error}=await db.from('bens_patrimoniais').delete().eq('id',b.id);if(error){alert('Erro ao excluir: '+error.message);return}selected.delete(b.id);await loadBens()};td.append(edit,del);tr.append(td);tbody.append(tr)});
+ table.append(tbody);host.replaceChildren(table);$('pageInfo').textContent=`Página ${page} de ${pages} — ${arr.length} bem(ns)`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
 }
-
-
-/* ==========================================
-   INICIALIZAÇÃO
-========================================== */
-
-carregarBaseInicial();
-
-</script>
-
-</body>
-</html>
+$('searchBens').oninput=()=>{page=1;renderList()};$('prev').onclick=()=>{page--;renderList()};$('next').onclick=()=>{page++;renderList()};$('refresh').onclick=loadBens;
+function renderChoices(){
+ const host=$('labelChoices'),arr=filteredBens($('searchLabels').value);host.replaceChildren();
+ if(!arr.length){host.textContent='Nenhum bem encontrado.';return}
+ const table=document.createElement('table'),body=document.createElement('tbody');
+ arr.forEach(b=>{const tr=document.createElement('tr'),td0=document.createElement('td');td0.className='checkcell';const cb=document.createElement('input');cb.type='checkbox';cb.checked=selected.has(b.id);cb.style.width='auto';cb.onchange=()=>cb.checked?selected.add(b.id):selected.delete(b.id);td0.append(cb);
+ const td1=document.createElement('td');td1.textContent=b.patrimonio;const td2=document.createElement('td');td2.textContent=b.descricao;tr.append(td0,td1,td2);body.append(tr)});
+ table.append(body);host.append(table);
+}
+$('searchLabels').oninput=renderChoices;
+$('selectVisible').onclick=()=>{filteredBens($('searchLabels').value).forEach(b=>selected.add(b.id));renderChoices();say('labelMsg',selected.size+' bem(ns) selecionado(s).')};
+$('clearSelection').onclick=()=>{selected.clear();renderChoices();$('labels').replaceChildren();$('labelPreview').classList.add('hidden');$('printLabels').disabled=true;say('labelMsg','Seleção limpa.')};
+async function makeLabel(b){
+ const card=document.createElement('div');card.className='label';
+ const head=document.createElement('div');head.className='label-head';const brand=document.createElement('div');brand.className='label-brand';
+ const logo=document.createElement('img');logo.className='label-logo';logo.src=LOGO;logo.alt='CRCAL';logo.onerror=()=>logo.style.display='none';
+ const name=document.createElement('span');name.textContent='CRCAL';brand.append(logo,name);
+ const type=document.createElement('span');type.className='label-type';type.textContent='PATRIMÔNIO';head.append(brand,type);
+ const body=document.createElement('div');body.className='label-body';const info=document.createElement('div');info.className='label-info';
+ const num=document.createElement('div');num.className='label-num';num.textContent=b.patrimonio;const desc=document.createElement('div');desc.className='label-desc';desc.textContent=b.descricao;info.append(num,desc);
+ const canvas=document.createElement('canvas');canvas.className='qr';body.append(info,canvas);
+ const foot=document.createElement('div');foot.className='label-foot';foot.textContent='ESCANEIE PARA CONSULTAR ESTE BEM';card.append(head,body,foot);
+ const url=BASE+'?id='+encodeURIComponent(b.patrimonio);
+ await QRCode.toCanvas(canvas,url,{width:400,margin:3,errorCorrectionLevel:'M'});return card;
+}
+$('generateLabels').onclick=async()=>{
+ const chosen=bens.filter(b=>selected.has(b.id));if(!chosen.length){say('labelMsg','Selecione pelo menos um bem.',true);return}
+ const btn=$('generateLabels');btn.disabled=true;say('labelMsg','Gerando '+chosen.length+' etiqueta(s)...');
+ try{const frag=document.createDocumentFragment();for(const b of chosen)frag.append(await makeLabel(b));$('labels').replaceChildren(frag);$('labelPreview').classList.remove('hidden');$('printLabels').disabled=false;say('labelMsg',chosen.length+' etiqueta(s) gerada(s).')}
+ catch(e){say('labelMsg','Falha ao gerar etiqueta: '+e.message,true)}finally{btn.disabled=false}
+};
+$('printLabels').onclick=()=>window.print();
+$('loginBtn').onclick=async()=>{
+ const btn=$('loginBtn');btn.disabled=true;say('loginMsg','Validando acesso...');
+ const {error}=await db.auth.signInWithPassword({email:clean($('email').value),password:$('password').value});
+ btn.disabled=false;if(error)say('loginMsg','Não foi possível entrar: '+error.message,true);
+};
+$('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
+$('logout').onclick=async()=>{await db.auth.signOut();};
+async function setSession(session){
+ const logged=!!session;$('login').classList.toggle('hidden',logged);$('admin').classList.toggle('hidden',!logged);$('logout').classList.toggle('hidden',!logged);
+ if(logged){say('loginMsg','');await loadBens()}
+}
+db.auth.onAuthStateChange((_event,session)=>{setSession(session)});
+(async()=>{const {data}=await db.auth.getSession();await setSession(data.session)})();
+</script></body></html>
