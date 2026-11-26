@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Gerenciamento Patrimonial | CRCAL</title>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+
 
 <style>
 :root {
@@ -477,63 +477,70 @@ function mensagem(texto) {
 }
 
 
-/* CARREGAR QR CODE */
 
 function carregarQRCode() {
 
-    return new Promise((resolve, reject) => {
+    if (typeof window.QRCode?.toCanvas === 'function') {
+        return Promise.resolve();
+    }
 
-        if (window.QRCode) {
-            resolve();
-            return;
-        }
+    if (window.qrLoading) {
+        return window.qrLoading;
+    }
 
-        if (window.qrLoading) {
-            window.qrLoading.then(resolve).catch(reject);
-            return;
-        }
+    const fontes = [
+        'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js',
+        'https://unpkg.com/qrcode@1.5.4/build/qrcode.min.js'
+    ];
 
-        const fontes = [
-            'https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js',
-            'https://cdnjs.cloudflare.com/ajax/libs/qrcode/1.5.3/qrcode.min.js'
-        ];
+    window.qrLoading = new Promise((resolve, reject) => {
 
-        window.qrLoading = new Promise((ok, fail) => {
+        function tentar(indice) {
 
-            let indice = 0;
-
-            function tentar() {
-
-                if (window.QRCode) {
-                    ok();
-                    return;
-                }
-
-                if (indice >= fontes.length) {
-                    fail(new Error('Biblioteca QR Code indisponível.'));
-                    return;
-                }
-
-                const script = document.createElement('script');
-                script.src = fontes[indice++];
-                script.async = true;
-
-                script.onload = () => {
-                    if (window.QRCode) ok();
-                    else tentar();
-                };
-
-                script.onerror = tentar;
-
-                document.head.appendChild(script);
+            if (typeof window.QRCode?.toCanvas === 'function') {
+                resolve();
+                return;
             }
 
-            tentar();
-        });
+            if (indice >= fontes.length) {
+                reject(new Error(
+                    'Não foi possível carregar a biblioteca QR Code. Verifique sua conexão ou bloqueio de CDN.'
+                ));
+                return;
+            }
 
-        window.qrLoading.then(resolve).catch(reject);
+            const script = document.createElement('script');
+
+            script.src = fontes[indice];
+            script.async = true;
+
+            script.onload = () => {
+
+                if (typeof window.QRCode?.toCanvas === 'function') {
+                    resolve();
+                } else {
+                    tentar(indice + 1);
+                }
+
+            };
+
+            script.onerror = () => tentar(indice + 1);
+
+            document.head.appendChild(script);
+        }
+
+        tentar(0);
+
+    }).catch(erro => {
+
+        window.qrLoading = null;
+        throw erro;
+
     });
+
+    return window.qrLoading;
 }
+
 
 
 /* LISTA DE BENS */
@@ -715,8 +722,8 @@ async function render() {
     try {
         await renderLabels();
     } catch (erro) {
-        console.error(erro);
-        mensagem('Erro ao gerar QR Code. Verifique sua conexão.');
+        console.error('ERRO AO GERAR ETIQUETAS:', erro);
+        mensagem('Erro: ' + erro.message);
     }
 }
 
@@ -866,8 +873,9 @@ $('print').onclick = async () => {
 
     } catch (erro) {
 
-        mensagem('Não foi possível preparar os QR Codes.');
-        console.error(erro);
+        console.error('ERRO NA IMPRESSÃO:', erro);
+         
+        mensagem('Erro na impressão: ' + erro.message);
 
     }
 };
