@@ -427,7 +427,7 @@ footer {
 
     </div>
 
-    <p class="help" id="msg" aria-live="polite"></p>
+    <p class="help" id="msg" aria-live="polite">Carregando a base patrimonial...</p>
 
 </section>
 
@@ -500,6 +500,10 @@ let bens = [];
 let renderId = 0;
 
 let processando = false;
+
+// Só permite cadastrar quando a base atual estiver carregada
+// ou quando uma importação válida tiver sido realizada.
+let baseCarregada = false;
 
 
 /* ==========================================
@@ -815,6 +819,11 @@ $('add').onclick = async () => {
 
     if (processando) return;
 
+    if (!baseCarregada) {
+        mensagem('A base patrimonial ainda não foi carregada. Verifique sua conexão ou importe um bens.json atualizado.');
+        return;
+    }
+
     const bem = {
 
         patrimonio: trim($('pat').value),
@@ -974,20 +983,23 @@ $('file').onchange = async event => {
         }
 
         const anterior = bens;
+        const estadoAnterior = baseCarregada;
 
         bens = importados;
 
         const sucesso = await render();
 
         if (sucesso) {
+            baseCarregada = true;
 
             mensagem(
-                bens.length + ' bem(ns) importado(s) com sucesso!'
+                bens.length + ' bem(ns) importado(s) com sucesso! A base está pronta para uso.'
             );
 
         } else {
 
             bens = anterior;
+            baseCarregada = estadoAnterior;
 
             await render();
 
@@ -1036,10 +1048,82 @@ $('print').onclick = async () => {
 
 
 /* ==========================================
+   CARREGAR BASE PUBLICADA AUTOMATICAMENTE
+========================================== */
+
+async function carregarBaseInicial() {
+    const botaoAdicionar = $('add');
+
+    botaoAdicionar.disabled = true;
+    mensagem('Buscando automaticamente a base patrimonial publicada...');
+
+    try {
+        const resposta = await fetch(BASE + 'bens.json?atualizacao=' + Date.now(), {
+            method: 'GET',
+            cache: 'no-store'
+        });
+
+        if (!resposta.ok) {
+            throw new Error('O arquivo bens.json não foi encontrado ou não pôde ser acessado (HTTP ' + resposta.status + ').');
+        }
+
+        const dados = await resposta.json();
+
+        if (!Array.isArray(dados)) {
+            throw new Error('O arquivo bens.json não contém uma lista válida de bens.');
+        }
+
+        const importados = dados.map(item => {
+            const bem = {};
+
+            CAMPOS.forEach(campo => {
+                bem[campo] = trim(item[campo]);
+            });
+
+            bem.situacao = bem.situacao || 'Em uso';
+            return bem;
+        });
+
+        if (importados.some(b => !b.patrimonio || !b.descricao)) {
+            throw new Error('A base publicada contém bem sem número patrimonial ou descrição.');
+        }
+
+        const numeros = importados.map(b => b.patrimonio);
+
+        if (new Set(numeros).size !== numeros.length) {
+            throw new Error('A base publicada contém números patrimoniais duplicados.');
+        }
+
+        bens = importados;
+        baseCarregada = true;
+
+        const sucesso = await render();
+
+        if (!sucesso) {
+            throw new Error('A base foi carregada, mas houve uma falha ao montar as etiquetas.');
+        }
+
+        mensagem(bens.length + ' bem(ns) carregado(s) automaticamente. Você já pode cadastrar novos bens.');
+
+    } catch (erro) {
+        console.error('Falha ao carregar a base patrimonial:', erro);
+
+        bens = [];
+        baseCarregada = false;
+        await render();
+
+        mensagem('Não foi possível carregar a base automaticamente: ' + erro.message + ' Confira se o bens.json está publicado na raiz do site ou importe o arquivo manualmente.');
+    } finally {
+        botaoAdicionar.disabled = false;
+    }
+}
+
+
+/* ==========================================
    INICIALIZAÇÃO
 ========================================== */
 
-render();
+carregarBaseInicial();
 
 </script>
 
