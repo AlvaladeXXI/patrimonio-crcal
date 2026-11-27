@@ -1302,8 +1302,11 @@ module.exports = QRCode;
 <style>
 :root{--azul:#00417D;--escuro:#283656;--ouro:#B29448;--fundo:#F5F7FA}
 *{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:var(--fundo);color:#17212b}
-header{background:#fff;padding:20px;border-bottom:3px solid var(--ouro)}.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-h1{font-size:21px;color:var(--azul);margin:0 0 5px}.sub{color:#657383;font-size:12px;margin:0}
+header{background:#fff;padding:16px 20px;border-bottom:3px solid var(--ouro)}
+.head{max-width:1250px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:14px}
+.header-logo{width:58px;height:58px;object-fit:contain;display:block}
+h1{font-size:22px;color:var(--azul);margin:0;letter-spacing:.2px}.sub{color:#657383;font-size:12px;margin:0}
 main{max-width:1150px;margin:24px auto;padding:0 16px}.panel{background:#fff;padding:20px;border-radius:12px;margin-bottom:18px;box-shadow:0 3px 14px #14283d12}
 h2{color:var(--azul);font-size:19px;margin:0 0 12px}.muted{color:#657383;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 label{display:block;font-weight:bold;font-size:12px;margin:0 0 5px}input,select{width:100%;padding:11px;border:1px solid #cbd5df;border-radius:7px;font-size:14px;background:#fff}
@@ -1320,7 +1323,12 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}td,th{t
 .label-type{font-size:6.5pt;color:var(--ouro);font-weight:bold}.label-body{display:flex;align-items:center;justify-content:space-between;gap:2mm;flex:1;min-height:0}
 .label-info{min-width:0;flex:1}.label-num{font-size:12pt;font-weight:bold;color:var(--azul);overflow-wrap:anywhere}.label-desc{font-size:7pt;line-height:1.2;max-height:18mm;overflow:hidden}
 .qr{width:20mm;height:20mm;flex:0 0 20mm}.label-foot{text-align:center;font-size:6pt;border-top:1px solid #dce3ea;padding-top:1mm;color:var(--azul)}
-#login{max-width:430px;margin:50px auto}.login-logo{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 15px}
+#login{max-width:500px;margin:70px auto; padding:34px 36px}
+#login h2{text-align:center;margin:0 0 26px;font-size:22px}
+#login .actions{justify-content:center}
+#login .actions button{min-width:110px}
+#loginMsg{text-align:center}
+@media(max-width:700px){header{padding:14px}.brand{gap:10px}.header-logo{width:46px;height:46px}h1{font-size:18px}#login{margin:36px auto;padding:26px 22px}}
 footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column;align-items:stretch}.label-grid{grid-template-columns:repeat(2,6cm)}table{display:block;overflow-x:auto}}
 @media print{@page{size:A4 portrait;margin:1cm}body{background:#fff}header,.no-print,footer{display:none!important}main{margin:0;padding:0;max-width:none}.panel{padding:0;margin:0;box-shadow:none}#labels{display:grid!important;grid-template-columns:repeat(3,6cm);gap:0}.label{border:1px solid #ddd}.qr{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
@@ -1466,11 +1474,10 @@ td.table-actions {
 </style>
 </head>
 <body>
-<header class="no-print"><div class="head"><div><h1>GERENCIAMENTO PATRIMONIAL</h1><p class="sub">Conselho Regional de Contabilidade de Alagoas</p><p class="sub">Cadastro, consulta e identificação de bens</p></div><button id="logout" class="alt hidden">Sair</button></div></header>
+<header class="no-print"><div class="head"><div class="brand"><img class="header-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="Logo CRCAL"><h1>GERENCIAMENTO PATRIMONIAL</h1></div><button id="logout" class="alt hidden">Sair</button></div></header>
 <main>
 <section id="login" class="panel no-print">
-<img class="login-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="CRCAL">
-<h2>Acesso administrativo</h2><p class="muted">Entre com seu usuário autorizado para gerenciar os bens patrimoniais.</p>
+<h2>Acesso administrativo</h2>
 <label for="email">E-mail</label><input id="email" type="email" autocomplete="username">
 <label for="password" style="margin-top:12px">Senha</label><input id="password" type="password" autocomplete="current-password">
 <div class="actions"><button id="loginBtn">Entrar</button></div><p id="loginMsg" class="notice" aria-live="polite"></p>
