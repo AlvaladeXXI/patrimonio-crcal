@@ -1471,13 +1471,26 @@ td.table-actions {
     vertical-align: middle;
 }
 
+
+/* Perfis de acesso e gerenciamento de usuários */
+.user-management { margin-top: 16px; }
+.user-management .form-grid { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; align-items:end; }
+.user-management .user-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.user-management .user-row select { min-width:140px; }
+.user-id { font-family:monospace; font-size:12px; color:#657383; overflow-wrap:anywhere; }
+.role-pill { display:inline-block; padding:4px 9px; border-radius:999px; background:#e8eef6; color:#283656; font-size:12px; font-weight:700; }
+.role-pill.admin { background:#e7f3ec; color:#17633a; }
+@media(max-width:760px) {
+  .user-management .form-grid { grid-template-columns:1fr; }
+}
+
 </style>
 </head>
 <body>
 <header class="no-print"><div class="head"><div class="brand"><img class="header-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="Logo CRCAL"><h1>GERENCIAMENTO PATRIMONIAL</h1></div><button id="logout" class="alt hidden">Sair</button></div></header>
 <main>
 <section id="login" class="panel no-print">
-<h2>Acesso administrativo</h2>
+<h2>Acesso ao sistema</h2>
 <label for="email">E-mail</label><input id="email" type="email" autocomplete="username">
 <label for="password" style="margin-top:12px">Senha</label><input id="password" type="password" autocomplete="current-password">
 <div class="actions"><button id="loginBtn">Entrar</button></div><p id="loginMsg" class="notice" aria-live="polite"></p>
@@ -1487,6 +1500,7 @@ td.table-actions {
 <button class="tab active" data-tab="cadastro">Cadastrar bem</button>
 <button class="tab alt" data-tab="bens">Bens cadastrados</button>
 <button class="tab alt" data-tab="etiquetas">Etiquetas</button>
+<button class="tab alt admin-only hidden" data-tab="usuarios">Usuários</button>
 </nav>
 <section id="tab-cadastro" class="panel no-print">
 <h2 id="formTitle">Cadastrar novo bem</h2><p class="muted">Os dados são gravados diretamente na base patrimonial.</p>
@@ -1523,7 +1537,7 @@ td.table-actions {
 <div class="actions"><button id="saveBtn">Salvar bem</button><button id="cancelEdit" class="alt hidden">Cancelar edição</button></div><p id="formMsg" class="notice" aria-live="polite"></p>
 </section>
 <section id="tab-bens" class="panel hidden no-print">
-<h2>Bens cadastrados</h2><p class="muted">Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.</p>
+<h2>Bens cadastrados</h2><p class="muted" id="bensHelp">Pesquise pelo número patrimonial, descrição ou localização.</p>
 <div class="searchrow">
     <input id="searchBens" placeholder="Pesquisar bens...">
     <select id="filterSituacao">
@@ -1544,6 +1558,38 @@ td.table-actions {
 <div class="searchrow"><input id="searchLabels" placeholder="Filtrar por patrimônio ou descrição..."><button id="selectVisible" class="alt">Selecionar exibidos</button><button id="clearSelection" class="alt">Limpar seleção</button></div>
 <div id="labelChoices"></div><div class="actions"><button id="generateLabels">Gerar etiquetas selecionadas</button><button id="printLabels" class="alt" disabled>Imprimir A4</button></div><p id="labelMsg" class="notice"></p>
 </section>
+<section id="tab-usuarios" class="panel hidden no-print admin-only">
+<h2>Gerenciar usuários</h2>
+<p class="muted">Cadastre o perfil de usuários que já possuem conta no Supabase Auth. A criação da conta e o envio do convite/senha são feitos no painel do Supabase.</p>
+
+<div class="user-management">
+  <h3>Vincular usuário existente</h3>
+  <div class="form-grid">
+    <div>
+      <label for="newUserId">UUID do usuário no Supabase *</label>
+      <input id="newUserId" placeholder="Cole aqui o UUID do usuário">
+    </div>
+    <div>
+      <label for="newUserName">Nome</label>
+      <input id="newUserName" placeholder="Nome do usuário">
+    </div>
+    <div>
+      <label for="newUserRole">Perfil</label>
+      <select id="newUserRole">
+        <option value="LEITOR">LEITOR</option>
+        <option value="ADMIN">ADMIN</option>
+      </select>
+    </div>
+    <div>
+      <button id="addUserBtn">Adicionar</button>
+    </div>
+  </div>
+  <p class="muted">Primeiro crie a conta em Authentication → Users no Supabase. Depois copie o UUID e vincule aqui.</p>
+  <p id="userMsg" class="notice" aria-live="polite"></p>
+  <h3>Usuários cadastrados</h3>
+  <div id="usersHost">Carregando usuários...</div>
+</div>
+</section>
 <section class="panel hidden" id="labelPreview"><div class="no-print"><h2>Prévia das etiquetas — 6 × 4 cm</h2><p class="muted">Na impressão, selecione tamanho real ou escala de 100%.</p></div><div id="labels" class="label-grid"></div></section>
 </section>
 </main><footer>Conselho Regional de Contabilidade de Alagoas</footer>
@@ -1556,12 +1602,22 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const clean = v => String(v ?? '').trim();
 let bens = [], page = 1, editingId = null;
+let currentProfile = null;
+const ADMIN_ID = '1e3620f2-2a98-456f-9741-14c6a597701a';
 const PAGE_SIZE = 15, selected = new Set();
 function say(id, msg, error=false){$(id).textContent=msg;$(id).classList.toggle('error',error)}
 function showTab(name){
+ if (name === 'cadastro' || name === 'usuarios') {
+   if (currentProfile?.perfil !== 'ADMIN') name = 'bens';
+ }
  document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===name);b.classList.toggle('alt',b.dataset.tab!==name)});
- ['cadastro','bens','etiquetas'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==name));
- if(name==='bens') renderList(); if(name==='etiquetas') renderChoices();
+ ['cadastro','bens','etiquetas','usuarios'].forEach(t=>{
+   const el=$('tab-'+t);
+   if(el) el.classList.toggle('hidden',t!==name);
+ });
+ if(name==='bens') renderList();
+ if(name==='etiquetas') renderChoices();
+ if(name==='usuarios' && currentProfile?.perfil==='ADMIN') loadProfiles();
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 async function loadBens(){
@@ -1635,8 +1691,11 @@ function renderList() {
     const thead = document.createElement('thead');
     const trh = document.createElement('tr');
 
-    ['Patrimônio', 'Descrição', 'Localização', 'Situação', 'Ações']
-        .forEach(titulo => {
+    const headers = currentProfile?.perfil === 'ADMIN'
+        ? ['Patrimônio', 'Descrição', 'Localização', 'Situação', 'Ações']
+        : ['Patrimônio', 'Descrição', 'Localização', 'Situação'];
+
+    headers.forEach(titulo => {
             const th = document.createElement('th');
             th.textContent = titulo;
             trh.append(th);
@@ -1661,39 +1720,41 @@ function renderList() {
             tr.append(td);
         });
 
-        const td = document.createElement('td');
-        td.className = 'table-actions';
+        if (currentProfile?.perfil === 'ADMIN') {
+            const td = document.createElement('td');
+            td.className = 'table-actions';
 
-        const edit = document.createElement('button');
-        edit.textContent = 'Editar';
-        edit.className = 'alt';
-        edit.onclick = () => beginEdit(b);
+            const edit = document.createElement('button');
+            edit.textContent = 'Editar';
+            edit.className = 'alt';
+            edit.onclick = () => beginEdit(b);
 
-        const del = document.createElement('button');
-        del.textContent = 'Excluir';
-        del.className = 'danger';
-        del.onclick = async () => {
-            if (!confirm(
-                'Excluir o bem ' + b.patrimonio +
-                '? Esta ação não pode ser desfeita.'
-            )) return;
+            const del = document.createElement('button');
+            del.textContent = 'Excluir';
+            del.className = 'danger';
+            del.onclick = async () => {
+                if (!confirm(
+                    'Excluir o bem ' + b.patrimonio +
+                    '? Esta ação não pode ser desfeita.'
+                )) return;
 
-            const { error } = await db
-                .from('bens_patrimoniais')
-                .delete()
-                .eq('id', b.id);
+                const { error } = await db
+                    .from('bens_patrimoniais')
+                    .delete()
+                    .eq('id', b.id);
 
-            if (error) {
-                alert('Erro ao excluir: ' + error.message);
-                return;
-            }
+                if (error) {
+                    alert('Erro ao excluir: ' + error.message);
+                    return;
+                }
 
-            selected.delete(b.id);
-            await loadBens();
-        };
+                selected.delete(b.id);
+                await loadBens();
+            };
 
-        td.append(edit, del);
-        tr.append(td);
+            td.append(edit, del);
+            tr.append(td);
+        }
         tbody.append(tr);
     });
 
@@ -1761,6 +1822,207 @@ $('generateLabels').onclick=async()=>{
  catch(e){say('labelMsg','Falha ao gerar etiqueta: '+e.message,true)}finally{btn.disabled=false}
 };
 $('printLabels').onclick=()=>window.print();
+
+// ============================================================
+// PERFIS E GERENCIAMENTO DE USUÁRIOS
+// ============================================================
+
+function applyRoleInterface() {
+    const isAdmin = currentProfile?.perfil === 'ADMIN';
+    document.querySelectorAll('.admin-only').forEach(el => {
+        el.classList.toggle('hidden', !isAdmin);
+    });
+
+    // A aba de cadastro só aparece para administradores.
+    document.querySelector('[data-tab="cadastro"]')?.classList.toggle('hidden', !isAdmin);
+
+    // Se o usuário for leitor, começa na consulta de bens.
+    if (!isAdmin) {
+        $('bensHelp').textContent =
+            'Consulta de bens patrimoniais. Você também pode gerar e imprimir etiquetas.';
+        showTab('bens');
+    } else {
+        $('bensHelp').textContent =
+            'Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.';
+        showTab('cadastro');
+    }
+    renderList();
+}
+
+async function loadProfiles() {
+    if (currentProfile?.perfil !== 'ADMIN') return;
+
+    const host = $('usersHost');
+    host.textContent = 'Carregando usuários...';
+
+    const { data, error } = await db
+        .from('perfis_usuarios')
+        .select('id,nome,perfil,ativo,criado_em')
+        .order('nome', { ascending: true });
+
+    if (error) {
+        host.textContent = 'Erro ao carregar usuários: ' + error.message;
+        return;
+    }
+
+    if (!data?.length) {
+        host.textContent = 'Nenhum usuário cadastrado.';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+
+    ['Usuário / UUID', 'Perfil', 'Situação', 'Ação'].forEach(label => {
+        const th = document.createElement('th');
+        th.textContent = label;
+        headRow.append(th);
+    });
+    thead.append(headRow);
+    table.append(thead);
+
+    const tbody = document.createElement('tbody');
+
+    data.forEach(profile => {
+        const tr = document.createElement('tr');
+
+        const identity = document.createElement('td');
+        const name = document.createElement('strong');
+        name.textContent = profile.nome || 'Usuário sem nome';
+        const uuid = document.createElement('div');
+        uuid.className = 'user-id';
+        uuid.textContent = profile.id;
+        identity.append(name, uuid);
+
+        const roleCell = document.createElement('td');
+        const roleSelect = document.createElement('select');
+        ['LEITOR', 'ADMIN'].forEach(role => {
+            const option = document.createElement('option');
+            option.value = role;
+            option.textContent = role;
+            roleSelect.append(option);
+        });
+        roleSelect.value = profile.perfil;
+        roleSelect.disabled = profile.id === ADMIN_ID;
+
+        const activeCell = document.createElement('td');
+        const activeLabel = document.createElement('label');
+        const activeCheck = document.createElement('input');
+        activeCheck.type = 'checkbox';
+        activeCheck.checked = !!profile.ativo;
+        activeCheck.style.width = 'auto';
+        activeCheck.disabled = profile.id === ADMIN_ID;
+        activeLabel.append(activeCheck, document.createTextNode(' Ativo'));
+        activeCell.append(activeLabel);
+
+        const actionCell = document.createElement('td');
+        const save = document.createElement('button');
+        save.textContent = 'Salvar';
+        save.className = 'alt';
+        save.disabled = profile.id === ADMIN_ID;
+        save.onclick = async () => {
+            save.disabled = true;
+            const { error: updateError } = await db
+                .from('perfis_usuarios')
+                .update({
+                    perfil: roleSelect.value,
+                    ativo: activeCheck.checked
+                })
+                .eq('id', profile.id);
+
+            save.disabled = false;
+            if (updateError) {
+                say('userMsg', 'Erro ao atualizar: ' + updateError.message, true);
+                return;
+            }
+            say('userMsg', 'Perfil atualizado com sucesso.');
+            await loadProfiles();
+        };
+
+        actionCell.append(save);
+        tr.append(identity, roleCell, activeCell, actionCell);
+        roleCell.append(roleSelect);
+        tbody.append(tr);
+    });
+
+    table.append(tbody);
+    host.replaceChildren(table);
+}
+
+$('addUserBtn').onclick = async () => {
+    if (currentProfile?.perfil !== 'ADMIN') return;
+
+    const id = clean($('newUserId').value);
+    const nome = clean($('newUserName').value);
+    const perfil = $('newUserRole').value;
+
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
+        say('userMsg', 'Informe um UUID válido do usuário no Supabase Auth.', true);
+        return;
+    }
+
+    if (id === ADMIN_ID && perfil !== 'ADMIN') {
+        say('userMsg', 'O administrador principal não pode ser rebaixado.', true);
+        return;
+    }
+
+    const btn = $('addUserBtn');
+    btn.disabled = true;
+
+    const { error } = await db
+        .from('perfis_usuarios')
+        .upsert({
+            id,
+            nome: nome || null,
+            perfil,
+            ativo: true
+        }, { onConflict: 'id' });
+
+    btn.disabled = false;
+
+    if (error) {
+        say('userMsg', 'Não foi possível vincular o usuário. Confira se a conta já existe no Supabase Auth. Detalhe: ' + error.message, true);
+        return;
+    }
+
+    $('newUserId').value = '';
+    $('newUserName').value = '';
+    $('newUserRole').value = 'LEITOR';
+    say('userMsg', 'Usuário vinculado com sucesso.');
+    await loadProfiles();
+};
+
+async function loadCurrentProfile(session) {
+    currentProfile = null;
+
+    if (!session?.user?.id) return false;
+
+    const { data, error } = await db
+        .from('perfis_usuarios')
+        .select('id,nome,perfil,ativo')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+    if (error || !data || !data.ativo) {
+        say('loginMsg',
+            'Seu usuário não possui perfil ativo no Gerenciamento Patrimonial. Solicite ao administrador a liberação do acesso.',
+            true
+        );
+        await db.auth.signOut();
+        return false;
+    }
+
+    if (!['ADMIN', 'LEITOR'].includes(data.perfil)) {
+        say('loginMsg', 'Perfil de acesso inválido. Solicite suporte ao administrador.', true);
+        await db.auth.signOut();
+        return false;
+    }
+
+    currentProfile = data;
+    return true;
+}
+
 $('loginBtn').onclick=async()=>{
  const btn=$('loginBtn');btn.disabled=true;say('loginMsg','Validando acesso...');
  const {error}=await db.auth.signInWithPassword({email:clean($('email').value),password:$('password').value});
@@ -1768,10 +2030,45 @@ $('loginBtn').onclick=async()=>{
 };
 $('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
 $('logout').onclick=async()=>{await db.auth.signOut();};
-async function setSession(session){
- const logged=!!session;$('login').classList.toggle('hidden',logged);$('admin').classList.toggle('hidden',!logged);$('logout').classList.toggle('hidden',!logged);
- if(logged){say('loginMsg','');await loadBens()}
+async function setSession(session) {
+    const logged = !!session;
+
+    if (!logged) {
+        currentProfile = null;
+        $('login').classList.remove('hidden');
+        $('admin').classList.add('hidden');
+        $('logout').classList.add('hidden');
+        return;
+    }
+
+    const allowed = await loadCurrentProfile(session);
+    if (!allowed) {
+        $('login').classList.remove('hidden');
+        $('admin').classList.add('hidden');
+        $('logout').classList.add('hidden');
+        return;
+    }
+
+    $('login').classList.add('hidden');
+    $('admin').classList.remove('hidden');
+    $('logout').classList.remove('hidden');
+    say('loginMsg', '');
+
+    applyRoleInterface();
+    await loadBens();
+
+    if (currentProfile?.perfil === 'ADMIN') {
+        await loadProfiles();
+    }
 }
-db.auth.onAuthStateChange((_event,session)=>{setSession(session)});
-(async()=>{const {data}=await db.auth.getSession();await setSession(data.session)})();
+
+// Evita executar consultas dentro do bloqueio interno do evento de autenticação.
+db.auth.onAuthStateChange((_event, session) => {
+    Promise.resolve().then(() => setSession(session));
+});
+
+(async () => {
+    const { data } = await db.auth.getSession();
+    await setSession(data.session);
+})();
 </script></body></html>
