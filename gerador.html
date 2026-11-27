@@ -1302,11 +1302,8 @@ module.exports = QRCode;
 <style>
 :root{--azul:#00417D;--escuro:#283656;--ouro:#B29448;--fundo:#F5F7FA}
 *{box-sizing:border-box}body{margin:0;font:14px Arial,sans-serif;background:var(--fundo);color:#17212b}
-header{background:#fff;padding:16px 20px;border-bottom:3px solid var(--ouro)}
-.head{max-width:1250px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-.brand{display:flex;align-items:center;gap:14px}
-.header-logo{width:58px;height:58px;object-fit:contain;display:block}
-h1{font-size:22px;color:var(--azul);margin:0;letter-spacing:.2px}.sub{color:#657383;font-size:12px;margin:0}
+header{background:#fff;padding:20px;border-bottom:3px solid var(--ouro)}.head{max-width:1150px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+h1{font-size:21px;color:var(--azul);margin:0 0 5px}.sub{color:#657383;font-size:12px;margin:0}
 main{max-width:1150px;margin:24px auto;padding:0 16px}.panel{background:#fff;padding:20px;border-radius:12px;margin-bottom:18px;box-shadow:0 3px 14px #14283d12}
 h2{color:var(--azul);font-size:19px;margin:0 0 12px}.muted{color:#657383;line-height:1.5}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 label{display:block;font-weight:bold;font-size:12px;margin:0 0 5px}input,select{width:100%;padding:11px;border:1px solid #cbd5df;border-radius:7px;font-size:14px;background:#fff}
@@ -1323,174 +1320,167 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}td,th{t
 .label-type{font-size:6.5pt;color:var(--ouro);font-weight:bold}.label-body{display:flex;align-items:center;justify-content:space-between;gap:2mm;flex:1;min-height:0}
 .label-info{min-width:0;flex:1}.label-num{font-size:12pt;font-weight:bold;color:var(--azul);overflow-wrap:anywhere}.label-desc{font-size:7pt;line-height:1.2;max-height:18mm;overflow:hidden}
 .qr{width:20mm;height:20mm;flex:0 0 20mm}.label-foot{text-align:center;font-size:6pt;border-top:1px solid #dce3ea;padding-top:1mm;color:var(--azul)}
-#login{max-width:500px;margin:70px auto; padding:34px 36px}
-#login h2{text-align:center;margin:0 0 26px;font-size:22px}
-#login .actions{justify-content:center}
-#login .actions button{min-width:110px}
-#loginMsg{text-align:center}
-@media(max-width:700px){header{padding:14px}.brand{gap:10px}.header-logo{width:46px;height:46px}h1{font-size:18px}#login{margin:36px auto;padding:26px 22px}}
+#login{max-width:430px;margin:50px auto}.login-logo{width:90px;height:90px;object-fit:contain;display:block;margin:0 auto 15px}
 footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column;align-items:stretch}.label-grid{grid-template-columns:repeat(2,6cm)}table{display:block;overflow-x:auto}}
 @media print{@page{size:A4 portrait;margin:1cm}body{background:#fff}header,.no-print,footer{display:none!important}main{margin:0;padding:0;max-width:none}.panel{padding:0;margin:0;box-shadow:none}#labels{display:grid!important;grid-template-columns:repeat(3,6cm);gap:0}.label{border:1px solid #ddd}.qr{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 
-/* ETIQUETA — padrão visual original do gerador */
+/* ============================================================
+   ETIQUETA PATRIMONIAL — PADRÃO CRCAL 8 x 2,5 CM
+   ============================================================ */
+.label-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 8cm);
+    column-gap: 3mm;
+    row-gap: 2mm;
+    justify-content: start;
+    align-content: start;
+    margin-top: 15px;
+}
+
 .label {
-    width: 6cm;
-    height: 4cm;
-    padding: 2.5mm;
-    border: 1px dashed #b8c2cc;
-    background: white;
+    width: 8cm;
+    height: 2.5cm;
+    padding: 1.2mm;
+    border: 0.25mm solid #9da8b3;
+    border-radius: 0.5mm;
+    background: #fff;
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.5mm;
     overflow: hidden;
     break-inside: avoid;
     page-break-inside: avoid;
 }
-.label-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 8mm;
-    border-bottom: 1px solid var(--dourado);
-    padding-bottom: 1.5mm;
-}
+
 .label-logo {
-    width: 8mm;
-    height: 7mm;
+    width: 12mm;
+    height: 19mm;
+    flex: 0 0 12mm;
     object-fit: contain;
+    display: block;
 }
-.label-brand {
-    display: flex;
-    align-items: center;
-    gap: 1.5mm;
-    color: var(--azul);
-    font-size: 8pt;
-    font-weight: bold;
-}
-.label-type {
-    color: var(--azul);
-    font-size: 7pt;
-    font-weight: bold;
-}
-.label-body {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 2mm;
-    flex: 1;
-    min-height: 0;
-}
+
 .label-info {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
 }
+
 .label-num {
-    font-size: 19pt;
-    font-weight: 800;
     color: var(--azul);
-    line-height: 1.1;
-    overflow-wrap: anywhere;
+    font-size: 20pt;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    margin-bottom: 1mm;
 }
+
 .label-desc {
-    font-size: 7.5pt;
-    font-weight: bold;
-    line-height: 1.2;
-    margin-top: 1.5mm;
-    max-height: 10mm;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    color: #283656;
+    font-size: 7pt;
+    font-weight: 500;
+    line-height: 1.05;
     overflow: hidden;
     overflow-wrap: anywhere;
+    word-break: normal;
+    display: block;
 }
+
 .qr {
     width: 20mm;
     height: 20mm;
     flex: 0 0 20mm;
     display: block;
     object-fit: contain;
-    background: white;
-}
-.label-foot {
-    text-align: center;
-    font-size: 6.5pt;
-    border-top: 1px solid #dce3ea;
-    padding-top: 1mm;
-    color: var(--azul);
+    background: #fff;
 }
 
-
-
-/* Ajuda sobre as situações patrimoniais */
-.status-help {
-    margin-top: 16px;
-    padding: 12px 16px;
-    background: #f5f7fa;
-    border: 1px solid #dce3ea;
-    border-radius: 10px;
-}
-.status-help summary {
-    color: var(--azul);
-    font-weight: bold;
-    cursor: pointer;
-}
-.status-help-content {
-    margin-top: 12px;
-    padding-top: 8px;
-    border-top: 1px solid #dce3ea;
-}
-.status-help-content p {
-    margin: 9px 0;
-    line-height: 1.5;
-    font-size: 13px;
+@media(max-width:700px) {
+    .label-grid {
+        grid-template-columns: repeat(1, 8cm);
+        overflow-x: auto;
+    }
 }
 
-/* Filtros da listagem */
-.searchrow select {
-    max-width: 260px;
-}
+@media print {
+    @page {
+        size: A4 portrait;
+        margin: 8mm;
+    }
 
-/* Alinhamento dos botões de ação */
-.table-actions {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    vertical-align: middle;
-}
-.table-actions button {
-    margin: 0 !important;
-    min-width: 76px;
-    padding: 9px 12px;
-}
-th:last-child {
-    text-align: center;
-    min-width: 180px;
-}
-td.table-actions {
-    vertical-align: middle;
-}
+    html, body {
+        width: auto;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+    }
 
+    header, .no-print, footer {
+        display: none !important;
+    }
 
-/* Perfis de acesso e gerenciamento de usuários */
-.user-management { margin-top: 16px; }
-.user-management .form-grid { display:grid; grid-template-columns:2fr 1fr 1fr auto; gap:10px; align-items:end; }
-.user-management .user-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-.user-management .user-row select { min-width:140px; }
-.user-id { font-family:monospace; font-size:12px; color:#657383; overflow-wrap:anywhere; }
-.role-pill { display:inline-block; padding:4px 9px; border-radius:999px; background:#e8eef6; color:#283656; font-size:12px; font-weight:700; }
-.role-pill.admin { background:#e7f3ec; color:#17633a; }
-@media(max-width:760px) {
-  .user-management .form-grid { grid-template-columns:1fr; }
+    main {
+        width: auto;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .panel {
+        padding: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    #labelPreview {
+        display: block !important;
+    }
+
+    #labels {
+        display: grid !important;
+        grid-template-columns: repeat(2, 8cm) !important;
+        column-gap: 3mm;
+        row-gap: 2mm;
+        justify-content: start;
+        align-content: start;
+        margin: 0;
+        padding: 0;
+    }
+
+    .label {
+        width: 8cm;
+        height: 2.5cm;
+        border: 0.25mm solid #9da8b3;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .qr, .label-logo {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
 }
 
 </style>
 </head>
 <body>
-<header class="no-print"><div class="head"><div class="brand"><img class="header-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="Logo CRCAL"><h1>GERENCIAMENTO PATRIMONIAL</h1></div><button id="logout" class="alt hidden">Sair</button></div></header>
+<header class="no-print"><div class="head"><div><h1>GERENCIAMENTO PATRIMONIAL</h1><p class="sub">Conselho Regional de Contabilidade de Alagoas</p><p class="sub">Cadastro, consulta e identificação de bens</p></div><button id="logout" class="alt hidden">Sair</button></div></header>
 <main>
 <section id="login" class="panel no-print">
-<h2>Acesso ao sistema</h2>
+<img class="login-logo" src="https://alvaladexxi.github.io/patrimonio-crcal/logo-crcal.jpg" alt="CRCAL">
+<h2>Acesso administrativo</h2><p class="muted">Entre com seu usuário autorizado para gerenciar os bens patrimoniais.</p>
 <label for="email">E-mail</label><input id="email" type="email" autocomplete="username">
 <label for="password" style="margin-top:12px">Senha</label><input id="password" type="password" autocomplete="current-password">
 <div class="actions"><button id="loginBtn">Entrar</button></div><p id="loginMsg" class="notice" aria-live="polite"></p>
@@ -1500,97 +1490,31 @@ td.table-actions {
 <button class="tab active" data-tab="cadastro">Cadastrar bem</button>
 <button class="tab alt" data-tab="bens">Bens cadastrados</button>
 <button class="tab alt" data-tab="etiquetas">Etiquetas</button>
-<button class="tab alt admin-only hidden" data-tab="usuarios">Usuários</button>
 </nav>
 <section id="tab-cadastro" class="panel no-print">
 <h2 id="formTitle">Cadastrar novo bem</h2><p class="muted">Os dados são gravados diretamente na base patrimonial.</p>
 <div class="grid">
 <div><label for="pat">Número patrimonial *</label><input id="pat" placeholder="Ex.: 001258"></div>
-<div>
-<label for="sit">Situação</label>
-<select id="sit">
-<option>EM USO</option>
-<option>EM ESTOQUE</option>
-<option>EM MANUTENÇÃO</option>
-<option>EMPRESTADO</option>
-<option>AGUARDANDO DESTINAÇÃO</option>
-<option>BAIXADO</option>
-</select>
-</div>
+<div><label for="sit">Situação</label><select id="sit"><option>Em uso</option><option>Em estoque</option><option>Em manutenção</option><option>Baixado</option></select></div>
 <div class="wide"><label for="desc">Descrição *</label><input id="desc" placeholder="Ex.: Computador Dell OptiPlex"></div>
 <div><label for="loc">Localização</label><input id="loc" placeholder="Ex.: Departamento de Cobrança"></div>
 <div><label for="marca">Marca / modelo</label><input id="marca" placeholder="Ex.: Dell OptiPlex"></div>
 <div><label for="resp">Responsável / setor</label><input id="resp" placeholder="Ex.: DECOB"></div>
 <div><label for="obs">Observação</label><input id="obs" placeholder="Informação interna"></div>
 </div>
-<details class="status-help">
-    <summary>Entenda as situações patrimoniais</summary>
-    <div class="status-help-content">
-        <p><strong>EM USO:</strong> Bem em utilização normal pelo CRCAL.</p>
-        <p><strong>EM ESTOQUE:</strong> Bem disponível, mas ainda não destinado a um setor ou usuário.</p>
-        <p><strong>EM MANUTENÇÃO:</strong> Bem encaminhado para reparo ou manutenção.</p>
-        <p><strong>EMPRESTADO:</strong> Bem cedido temporariamente a alguém ou a outro setor/órgão.</p>
-        <p><strong>AGUARDANDO DESTINAÇÃO:</strong> Bem sem utilização, aguardando decisão sobre seu reaproveitamento, transferência ou baixa.</p>
-        <p><strong>BAIXADO:</strong> Bem cuja baixa patrimonial já foi formalizada.</p>
-    </div>
-</details>
 <div class="actions"><button id="saveBtn">Salvar bem</button><button id="cancelEdit" class="alt hidden">Cancelar edição</button></div><p id="formMsg" class="notice" aria-live="polite"></p>
 </section>
 <section id="tab-bens" class="panel hidden no-print">
-<h2>Bens cadastrados</h2><p class="muted" id="bensHelp">Pesquise pelo número patrimonial, descrição ou localização.</p>
-<div class="searchrow">
-    <input id="searchBens" placeholder="Pesquisar bens...">
-    <select id="filterSituacao">
-        <option value="">Todas as situações</option>
-        <option value="EM USO">EM USO</option>
-        <option value="EM ESTOQUE">EM ESTOQUE</option>
-        <option value="EM MANUTENÇÃO">EM MANUTENÇÃO</option>
-        <option value="EMPRESTADO">EMPRESTADO</option>
-        <option value="AGUARDANDO DESTINAÇÃO">AGUARDANDO DESTINAÇÃO</option>
-        <option value="BAIXADO">BAIXADO</option>
-    </select>
-    <button id="refresh" class="alt">Atualizar</button>
-</div>
+<h2>Bens cadastrados</h2><p class="muted">Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.</p>
+<div class="searchrow"><input id="searchBens" placeholder="Pesquisar bens..."><button id="refresh" class="alt">Atualizar</button></div>
 <div id="listHost"></div><div class="pager"><button id="prev" class="alt">Anterior</button><span id="pageInfo"></span><button id="next" class="alt">Próxima</button></div>
 </section>
 <section id="tab-etiquetas" class="panel no-print hidden">
-<h2>Gerar etiquetas</h2><p class="muted">Selecione somente os bens que deseja imprimir. As etiquetas são geradas sob demanda, no formato 6 × 4 cm.</p>
+<h2>Gerar etiquetas</h2><p class="muted">Selecione somente os bens que deseja imprimir. As etiquetas são geradas sob demanda, no formato 8 × 2,5 cm.</p>
 <div class="searchrow"><input id="searchLabels" placeholder="Filtrar por patrimônio ou descrição..."><button id="selectVisible" class="alt">Selecionar exibidos</button><button id="clearSelection" class="alt">Limpar seleção</button></div>
 <div id="labelChoices"></div><div class="actions"><button id="generateLabels">Gerar etiquetas selecionadas</button><button id="printLabels" class="alt" disabled>Imprimir A4</button></div><p id="labelMsg" class="notice"></p>
 </section>
-<section id="tab-usuarios" class="panel hidden no-print admin-only">
-<h2>Gerenciar usuários</h2>
-<p class="muted">Cadastre o perfil de usuários que já possuem conta no Supabase Auth. A criação da conta e o envio do convite/senha são feitos no painel do Supabase.</p>
-
-<div class="user-management">
-  <h3>Vincular usuário existente</h3>
-  <div class="form-grid">
-    <div>
-      <label for="newUserId">UUID do usuário no Supabase *</label>
-      <input id="newUserId" placeholder="Cole aqui o UUID do usuário">
-    </div>
-    <div>
-      <label for="newUserName">Nome</label>
-      <input id="newUserName" placeholder="Nome do usuário">
-    </div>
-    <div>
-      <label for="newUserRole">Perfil</label>
-      <select id="newUserRole">
-        <option value="LEITOR">LEITOR</option>
-        <option value="ADMIN">ADMIN</option>
-      </select>
-    </div>
-    <div>
-      <button id="addUserBtn">Adicionar</button>
-    </div>
-  </div>
-  <p class="muted">Primeiro crie a conta em Authentication → Users no Supabase. Depois copie o UUID e vincule aqui.</p>
-  <p id="userMsg" class="notice" aria-live="polite"></p>
-  <h3>Usuários cadastrados</h3>
-  <div id="usersHost">Carregando usuários...</div>
-</div>
-</section>
-<section class="panel hidden" id="labelPreview"><div class="no-print"><h2>Prévia das etiquetas — 6 × 4 cm</h2><p class="muted">Na impressão, selecione tamanho real ou escala de 100%.</p></div><div id="labels" class="label-grid"></div></section>
+<section class="panel hidden" id="labelPreview"><div class="no-print"><h2>Prévia das etiquetas — 8 × 2,5 cm</h2><p class="muted">Impressão em A4, duas colunas. Utilize tamanho real ou escala de 100%.</p></div><div id="labels" class="label-grid"></div></section>
 </section>
 </main><footer>Conselho Regional de Contabilidade de Alagoas</footer>
 <script>
@@ -1602,22 +1526,12 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = id => document.getElementById(id);
 const clean = v => String(v ?? '').trim();
 let bens = [], page = 1, editingId = null;
-let currentProfile = null;
-const ADMIN_ID = '1e3620f2-2a98-456f-9741-14c6a597701a';
 const PAGE_SIZE = 15, selected = new Set();
 function say(id, msg, error=false){$(id).textContent=msg;$(id).classList.toggle('error',error)}
 function showTab(name){
- if (name === 'cadastro' || name === 'usuarios') {
-   if (currentProfile?.perfil !== 'ADMIN') name = 'bens';
- }
  document.querySelectorAll('[data-tab]').forEach(b=>{b.classList.toggle('active',b.dataset.tab===name);b.classList.toggle('alt',b.dataset.tab!==name)});
- ['cadastro','bens','etiquetas','usuarios'].forEach(t=>{
-   const el=$('tab-'+t);
-   if(el) el.classList.toggle('hidden',t!==name);
- });
- if(name==='bens') renderList();
- if(name==='etiquetas') renderChoices();
- if(name==='usuarios' && currentProfile?.perfil==='ADMIN') loadProfiles();
+ ['cadastro','bens','etiquetas'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==name));
+ if(name==='bens') renderList(); if(name==='etiquetas') renderChoices();
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
 async function loadBens(){
@@ -1627,12 +1541,12 @@ async function loadBens(){
  bens=data||[];renderList();renderChoices();say('formMsg','');
 }
 function resetForm(){
- editingId=null;['pat','desc','loc','marca','resp','obs'].forEach(id=>$(id).value='');$('sit').value='EM USO';
+ editingId=null;['pat','desc','loc','marca','resp','obs'].forEach(id=>$(id).value='');$('sit').value='Em uso';
  $('formTitle').textContent='Cadastrar novo bem';$('saveBtn').textContent='Salvar bem';$('cancelEdit').classList.add('hidden');
 }
 function beginEdit(b){
  editingId=b.id;$('pat').value=b.patrimonio||'';$('desc').value=b.descricao||'';$('loc').value=b.localizacao||'';
- $('marca').value=b.marca_modelo||'';$('resp').value=b.responsavel||'';$('obs').value=b.observacao||'';$('sit').value=b.situacao||'EM USO';
+ $('marca').value=b.marca_modelo||'';$('resp').value=b.responsavel||'';$('obs').value=b.observacao||'';$('sit').value=b.situacao||'Em uso';
  $('formTitle').textContent='Editar bem patrimonial';$('saveBtn').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');
  showTab('cadastro');window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1647,149 +1561,20 @@ $('saveBtn').onclick=async()=>{
  if(result.error){say('formMsg','Não foi possível salvar: '+(result.error.code==='23505'?'Esse número patrimonial já está cadastrado.':result.error.message),true);return}
  resetForm();say('formMsg','Bem salvo com sucesso.');await loadBens();
 };
-function filteredBens(q, situacao = '') {
-    q = clean(q).toLocaleLowerCase('pt-BR');
-
-    return bens.filter(b => {
-        const correspondePesquisa = !q || [
-            b.patrimonio,
-            b.descricao,
-            b.localizacao
-        ].some(v => clean(v).toLocaleLowerCase('pt-BR').includes(q));
-
-        const correspondeSituacao = !situacao ||
-            clean(b.situacao).toLocaleUpperCase('pt-BR') === situacao;
-
-        return correspondePesquisa && correspondeSituacao;
-    });
+function filteredBens(q){q=clean(q).toLocaleLowerCase('pt-BR');return bens.filter(b=>!q||[b.patrimonio,b.descricao,b.localizacao].some(v=>clean(v).toLocaleLowerCase('pt-BR').includes(q)))}
+function renderList(){
+ const host=$('listHost'),arr=filteredBens($('searchBens').value),pages=Math.max(1,Math.ceil(arr.length/PAGE_SIZE));page=Math.min(page,pages);
+ const slice=arr.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+ if(!slice.length){host.textContent='Nenhum bem encontrado.';$('pageInfo').textContent='0 registros';return}
+ const table=document.createElement('table'),thead=document.createElement('thead'),trh=document.createElement('tr');
+ ['Patrimônio','Descrição','Localização','Situação','Ações'].forEach(x=>{const th=document.createElement('th');th.textContent=x;trh.append(th)});thead.append(trh);table.append(thead);
+ const tbody=document.createElement('tbody');
+ slice.forEach(b=>{const tr=document.createElement('tr');[b.patrimonio,b.descricao,b.localizacao||'—',b.situacao||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});
+ const td=document.createElement('td'),edit=document.createElement('button');edit.textContent='Editar';edit.className='alt';edit.onclick=()=>beginEdit(b);
+ const del=document.createElement('button');del.textContent='Excluir';del.className='danger';del.style.marginLeft='5px';del.onclick=async()=>{if(!confirm('Excluir o bem '+b.patrimonio+'? Esta ação não pode ser desfeita.'))return;const {error}=await db.from('bens_patrimoniais').delete().eq('id',b.id);if(error){alert('Erro ao excluir: '+error.message);return}selected.delete(b.id);await loadBens()};td.append(edit,del);tr.append(td);tbody.append(tr)});
+ table.append(tbody);host.replaceChildren(table);$('pageInfo').textContent=`Página ${page} de ${pages} — ${arr.length} bem(ns)`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
 }
-
-function renderList() {
-    const host = $('listHost');
-    const arr = filteredBens(
-        $('searchBens').value,
-        $('filterSituacao').value
-    );
-    const pages = Math.max(1, Math.ceil(arr.length / PAGE_SIZE));
-
-    page = Math.min(page, pages);
-
-    const slice = arr.slice(
-        (page - 1) * PAGE_SIZE,
-        page * PAGE_SIZE
-    );
-
-    if (!slice.length) {
-        host.textContent = 'Nenhum bem encontrado.';
-        $('pageInfo').textContent = '0 registros';
-        $('prev').disabled = true;
-        $('next').disabled = true;
-        return;
-    }
-
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    const trh = document.createElement('tr');
-
-    const headers = currentProfile?.perfil === 'ADMIN'
-        ? ['Patrimônio', 'Descrição', 'Localização', 'Situação', 'Ações']
-        : ['Patrimônio', 'Descrição', 'Localização', 'Situação'];
-
-    headers.forEach(titulo => {
-            const th = document.createElement('th');
-            th.textContent = titulo;
-            trh.append(th);
-        });
-
-    thead.append(trh);
-    table.append(thead);
-
-    const tbody = document.createElement('tbody');
-
-    slice.forEach(b => {
-        const tr = document.createElement('tr');
-
-        [
-            b.patrimonio,
-            b.descricao,
-            b.localizacao || '—',
-            b.situacao || '—'
-        ].forEach(valor => {
-            const td = document.createElement('td');
-            td.textContent = valor;
-            tr.append(td);
-        });
-
-        if (currentProfile?.perfil === 'ADMIN') {
-            const td = document.createElement('td');
-            td.className = 'table-actions';
-
-            const edit = document.createElement('button');
-            edit.textContent = 'Editar';
-            edit.className = 'alt';
-            edit.onclick = () => beginEdit(b);
-
-            const del = document.createElement('button');
-            del.textContent = 'Excluir';
-            del.className = 'danger';
-            del.onclick = async () => {
-                if (!confirm(
-                    'Excluir o bem ' + b.patrimonio +
-                    '? Esta ação não pode ser desfeita.'
-                )) return;
-
-                const { error } = await db
-                    .from('bens_patrimoniais')
-                    .delete()
-                    .eq('id', b.id);
-
-                if (error) {
-                    alert('Erro ao excluir: ' + error.message);
-                    return;
-                }
-
-                selected.delete(b.id);
-                await loadBens();
-            };
-
-            td.append(edit, del);
-            tr.append(td);
-        }
-        tbody.append(tr);
-    });
-
-    table.append(tbody);
-    host.replaceChildren(table);
-
-    $('pageInfo').textContent =
-        `Página ${page} de ${pages} — ${arr.length} bem(ns)`;
-
-    $('prev').disabled = page <= 1;
-    $('next').disabled = page >= pages;
-}
-
-$('searchBens').oninput = () => {
-    page = 1;
-    renderList();
-};
-
-$('filterSituacao').onchange = () => {
-    page = 1;
-    renderList();
-};
-
-$('prev').onclick = () => {
-    page--;
-    renderList();
-};
-
-$('next').onclick = () => {
-    page++;
-    renderList();
-};
-
-$('refresh').onclick = loadBens;
-
+$('searchBens').oninput=()=>{page=1;renderList()};$('prev').onclick=()=>{page--;renderList()};$('next').onclick=()=>{page++;renderList()};$('refresh').onclick=loadBens;
 function renderChoices(){
  const host=$('labelChoices'),arr=filteredBens($('searchLabels').value);host.replaceChildren();
  if(!arr.length){host.textContent='Nenhum bem encontrado.';return}
@@ -1803,226 +1588,66 @@ $('selectVisible').onclick=()=>{filteredBens($('searchLabels').value).forEach(b=
 $('clearSelection').onclick=()=>{selected.clear();renderChoices();$('labels').replaceChildren();$('labelPreview').classList.add('hidden');$('printLabels').disabled=true;say('labelMsg','Seleção limpa.')};
 async function makeLabel(b){
  const QRCode = window.QRCode;
- const card=document.createElement('div');card.className='label';
- const head=document.createElement('div');head.className='label-head';const brand=document.createElement('div');brand.className='label-brand';
- const logo=document.createElement('img');logo.className='label-logo';logo.src=LOGO;logo.alt='CRCAL';logo.onerror=()=>logo.style.display='none';
- const name=document.createElement('span');name.textContent='CRCAL';brand.append(logo,name);
- const type=document.createElement('span');type.className='label-type';type.textContent='PATRIMÔNIO';head.append(brand,type);
- const body=document.createElement('div');body.className='label-body';const info=document.createElement('div');info.className='label-info';
- const num=document.createElement('div');num.className='label-num';num.textContent=b.patrimonio;const desc=document.createElement('div');desc.className='label-desc';desc.textContent=b.descricao;info.append(num,desc);
- const canvas=document.createElement('canvas');canvas.className='qr';body.append(info,canvas);
- const foot=document.createElement('div');foot.className='label-foot';foot.textContent='ESCANEIE PARA CONSULTAR ESTE BEM';card.append(head,body,foot);
- const url=BASE+'?id='+encodeURIComponent(b.patrimonio);
- await QRCode.toCanvas(canvas,url,{width:400,margin:3,errorCorrectionLevel:'M'});return card;
+ const card = document.createElement('div');
+ card.className = 'label';
+
+ // Logo oficial à esquerda
+ const logo = document.createElement('img');
+ logo.className = 'label-logo';
+ logo.src = LOGO;
+ logo.alt = 'CRCAL';
+ logo.onerror = () => { logo.style.visibility = 'hidden'; };
+
+ // Número patrimonial e descrição completa no centro
+ const info = document.createElement('div');
+ info.className = 'label-info';
+
+ const num = document.createElement('div');
+ num.className = 'label-num';
+ num.textContent = clean(b.patrimonio);
+
+ const desc = document.createElement('div');
+ desc.className = 'label-desc';
+ desc.textContent = clean(b.descricao);
+
+ info.append(num, desc);
+
+ // QR Code à direita: mantém o endereço antigo para não invalidar etiquetas já emitidas
+ const canvas = document.createElement('canvas');
+ canvas.className = 'qr';
+ canvas.setAttribute('aria-label', 'QR Code do patrimônio ' + b.patrimonio);
+
+ card.append(logo, info, canvas);
+
+ const url = BASE + '?id=' + encodeURIComponent(b.patrimonio);
+ await QRCode.toCanvas(canvas, url, {
+   width: 500,
+   margin: 2,
+   errorCorrectionLevel: 'H',
+   color: { dark: '#000000', light: '#FFFFFF' }
+ });
+ return card;
 }
+
+function ajustarDescricoesEtiquetas(){
+ document.querySelectorAll('.label-desc').forEach(desc => {
+   let tamanho = 7;
+   desc.style.fontSize = tamanho + 'pt';
+   // Reduz gradualmente a fonte até que todo o texto caiba na área disponível.
+   while (tamanho > 4 && (desc.scrollHeight > desc.clientHeight + 1 || desc.scrollWidth > desc.clientWidth + 1)) {
+     tamanho -= 0.25;
+     desc.style.fontSize = tamanho + 'pt';
+   }
+ });
+}
+
 $('generateLabels').onclick=async()=>{
  const chosen=bens.filter(b=>selected.has(b.id));if(!chosen.length){say('labelMsg','Selecione pelo menos um bem.',true);return}
  const btn=$('generateLabels');btn.disabled=true;say('labelMsg','Gerando '+chosen.length+' etiqueta(s)...');
- try{const frag=document.createDocumentFragment();for(const b of chosen)frag.append(await makeLabel(b));$('labels').replaceChildren(frag);$('labelPreview').classList.remove('hidden');$('printLabels').disabled=false;say('labelMsg',chosen.length+' etiqueta(s) gerada(s).')}
+ try{const frag=document.createDocumentFragment();for(const b of chosen)frag.append(await makeLabel(b));$('labels').replaceChildren(frag);$('labelPreview').classList.remove('hidden');requestAnimationFrame(ajustarDescricoesEtiquetas);$('printLabels').disabled=false;say('labelMsg',chosen.length+' etiqueta(s) gerada(s).')}
  catch(e){say('labelMsg','Falha ao gerar etiqueta: '+e.message,true)}finally{btn.disabled=false}
 };
 $('printLabels').onclick=()=>window.print();
-
-// ============================================================
-// PERFIS E GERENCIAMENTO DE USUÁRIOS
-// ============================================================
-
-function applyRoleInterface() {
-    const isAdmin = currentProfile?.perfil === 'ADMIN';
-    document.querySelectorAll('.admin-only').forEach(el => {
-        el.classList.toggle('hidden', !isAdmin);
-    });
-
-    // A aba de cadastro só aparece para administradores.
-    document.querySelector('[data-tab="cadastro"]')?.classList.toggle('hidden', !isAdmin);
-
-    // Se o usuário for leitor, começa na consulta de bens.
-    if (!isAdmin) {
-        $('bensHelp').textContent =
-            'Consulta de bens patrimoniais. Você também pode gerar e imprimir etiquetas.';
-        showTab('bens');
-    } else {
-        $('bensHelp').textContent =
-            'Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.';
-        showTab('cadastro');
-    }
-    renderList();
-}
-
-async function loadProfiles() {
-    if (currentProfile?.perfil !== 'ADMIN') return;
-
-    const host = $('usersHost');
-    host.textContent = 'Carregando usuários...';
-
-    const { data, error } = await db
-        .from('perfis_usuarios')
-        .select('id,nome,perfil,ativo,criado_em')
-        .order('nome', { ascending: true });
-
-    if (error) {
-        host.textContent = 'Erro ao carregar usuários: ' + error.message;
-        return;
-    }
-
-    if (!data?.length) {
-        host.textContent = 'Nenhum usuário cadastrado.';
-        return;
-    }
-
-    const table = document.createElement('table');
-    const thead = document.createElement('thead');
-    const headRow = document.createElement('tr');
-
-    ['Usuário / UUID', 'Perfil', 'Situação', 'Ação'].forEach(label => {
-        const th = document.createElement('th');
-        th.textContent = label;
-        headRow.append(th);
-    });
-    thead.append(headRow);
-    table.append(thead);
-
-    const tbody = document.createElement('tbody');
-
-    data.forEach(profile => {
-        const tr = document.createElement('tr');
-
-        const identity = document.createElement('td');
-        const name = document.createElement('strong');
-        name.textContent = profile.nome || 'Usuário sem nome';
-        const uuid = document.createElement('div');
-        uuid.className = 'user-id';
-        uuid.textContent = profile.id;
-        identity.append(name, uuid);
-
-        const roleCell = document.createElement('td');
-        const roleSelect = document.createElement('select');
-        ['LEITOR', 'ADMIN'].forEach(role => {
-            const option = document.createElement('option');
-            option.value = role;
-            option.textContent = role;
-            roleSelect.append(option);
-        });
-        roleSelect.value = profile.perfil;
-        roleSelect.disabled = profile.id === ADMIN_ID;
-
-        const activeCell = document.createElement('td');
-        const activeLabel = document.createElement('label');
-        const activeCheck = document.createElement('input');
-        activeCheck.type = 'checkbox';
-        activeCheck.checked = !!profile.ativo;
-        activeCheck.style.width = 'auto';
-        activeCheck.disabled = profile.id === ADMIN_ID;
-        activeLabel.append(activeCheck, document.createTextNode(' Ativo'));
-        activeCell.append(activeLabel);
-
-        const actionCell = document.createElement('td');
-        const save = document.createElement('button');
-        save.textContent = 'Salvar';
-        save.className = 'alt';
-        save.disabled = profile.id === ADMIN_ID;
-        save.onclick = async () => {
-            save.disabled = true;
-            const { error: updateError } = await db
-                .from('perfis_usuarios')
-                .update({
-                    perfil: roleSelect.value,
-                    ativo: activeCheck.checked
-                })
-                .eq('id', profile.id);
-
-            save.disabled = false;
-            if (updateError) {
-                say('userMsg', 'Erro ao atualizar: ' + updateError.message, true);
-                return;
-            }
-            say('userMsg', 'Perfil atualizado com sucesso.');
-            await loadProfiles();
-        };
-
-        actionCell.append(save);
-        tr.append(identity, roleCell, activeCell, actionCell);
-        roleCell.append(roleSelect);
-        tbody.append(tr);
-    });
-
-    table.append(tbody);
-    host.replaceChildren(table);
-}
-
-$('addUserBtn').onclick = async () => {
-    if (currentProfile?.perfil !== 'ADMIN') return;
-
-    const id = clean($('newUserId').value);
-    const nome = clean($('newUserName').value);
-    const perfil = $('newUserRole').value;
-
-    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) {
-        say('userMsg', 'Informe um UUID válido do usuário no Supabase Auth.', true);
-        return;
-    }
-
-    if (id === ADMIN_ID && perfil !== 'ADMIN') {
-        say('userMsg', 'O administrador principal não pode ser rebaixado.', true);
-        return;
-    }
-
-    const btn = $('addUserBtn');
-    btn.disabled = true;
-
-    const { error } = await db
-        .from('perfis_usuarios')
-        .upsert({
-            id,
-            nome: nome || null,
-            perfil,
-            ativo: true
-        }, { onConflict: 'id' });
-
-    btn.disabled = false;
-
-    if (error) {
-        say('userMsg', 'Não foi possível vincular o usuário. Confira se a conta já existe no Supabase Auth. Detalhe: ' + error.message, true);
-        return;
-    }
-
-    $('newUserId').value = '';
-    $('newUserName').value = '';
-    $('newUserRole').value = 'LEITOR';
-    say('userMsg', 'Usuário vinculado com sucesso.');
-    await loadProfiles();
-};
-
-async function loadCurrentProfile(session) {
-    currentProfile = null;
-
-    if (!session?.user?.id) return false;
-
-    const { data, error } = await db
-        .from('perfis_usuarios')
-        .select('id,nome,perfil,ativo')
-        .eq('id', session.user.id)
-        .maybeSingle();
-
-    if (error || !data || !data.ativo) {
-        say('loginMsg',
-            'Seu usuário não possui perfil ativo no Gerenciamento Patrimonial. Solicite ao administrador a liberação do acesso.',
-            true
-        );
-        await db.auth.signOut();
-        return false;
-    }
-
-    if (!['ADMIN', 'LEITOR'].includes(data.perfil)) {
-        say('loginMsg', 'Perfil de acesso inválido. Solicite suporte ao administrador.', true);
-        await db.auth.signOut();
-        return false;
-    }
-
-    currentProfile = data;
-    return true;
-}
-
 $('loginBtn').onclick=async()=>{
  const btn=$('loginBtn');btn.disabled=true;say('loginMsg','Validando acesso...');
  const {error}=await db.auth.signInWithPassword({email:clean($('email').value),password:$('password').value});
@@ -2030,45 +1655,10 @@ $('loginBtn').onclick=async()=>{
 };
 $('password').addEventListener('keydown',e=>{if(e.key==='Enter')$('loginBtn').click()});
 $('logout').onclick=async()=>{await db.auth.signOut();};
-async function setSession(session) {
-    const logged = !!session;
-
-    if (!logged) {
-        currentProfile = null;
-        $('login').classList.remove('hidden');
-        $('admin').classList.add('hidden');
-        $('logout').classList.add('hidden');
-        return;
-    }
-
-    const allowed = await loadCurrentProfile(session);
-    if (!allowed) {
-        $('login').classList.remove('hidden');
-        $('admin').classList.add('hidden');
-        $('logout').classList.add('hidden');
-        return;
-    }
-
-    $('login').classList.add('hidden');
-    $('admin').classList.remove('hidden');
-    $('logout').classList.remove('hidden');
-    say('loginMsg', '');
-
-    applyRoleInterface();
-    await loadBens();
-
-    if (currentProfile?.perfil === 'ADMIN') {
-        await loadProfiles();
-    }
+async function setSession(session){
+ const logged=!!session;$('login').classList.toggle('hidden',logged);$('admin').classList.toggle('hidden',!logged);$('logout').classList.toggle('hidden',!logged);
+ if(logged){say('loginMsg','');await loadBens()}
 }
-
-// Evita executar consultas dentro do bloqueio interno do evento de autenticação.
-db.auth.onAuthStateChange((_event, session) => {
-    Promise.resolve().then(() => setSession(session));
-});
-
-(async () => {
-    const { data } = await db.auth.getSession();
-    await setSession(data.session);
-})();
+db.auth.onAuthStateChange((_event,session)=>{setSession(session)});
+(async()=>{const {data}=await db.auth.getSession();await setSession(data.session)})();
 </script></body></html>
