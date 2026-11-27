@@ -1341,64 +1341,84 @@ footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
 .label {
     width: 8cm;
     height: 2.5cm;
-    padding: 1.2mm;
+    box-sizing: border-box;
+    padding: 1mm;
     border: 0.25mm solid #9da8b3;
     border-radius: 0.5mm;
     background: #fff;
     display: flex;
     flex-direction: row;
-    align-items: center;
-    gap: 1.5mm;
+    align-items: stretch;
+    gap: 2mm;
     overflow: hidden;
     break-inside: avoid;
     page-break-inside: avoid;
 }
 
-.label-logo {
-    width: 12mm;
-    height: 19mm;
-    flex: 0 0 12mm;
-    object-fit: contain;
-    display: block;
-}
-
-.label-info {
+/* Área esquerda: logo e número na faixa superior; descrição abaixo */
+.label-left {
     flex: 1 1 auto;
     min-width: 0;
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     overflow: hidden;
 }
 
-.label-num {
-    color: var(--azul);
-    font-size: 20pt;
-    font-weight: 800;
-    line-height: 1;
-    white-space: nowrap;
-    margin-bottom: 1mm;
-}
-
-.label-desc {
+.label-top {
     flex: 1 1 auto;
     min-height: 0;
-    width: 100%;
-    color: #283656;
-    font-size: 7pt;
-    font-weight: 500;
-    line-height: 1.05;
+    display: flex;
+    align-items: center;
+    gap: 2mm;
     overflow: hidden;
-    overflow-wrap: anywhere;
-    word-break: normal;
+}
+
+.label-logo {
+    width: 15mm;
+    height: 15mm;
+    flex: 0 0 15mm;
+    object-fit: contain;
     display: block;
 }
 
+.label-num {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--azul);
+    font-size: 25pt;
+    font-weight: 800;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.label-desc {
+    flex: 0 0 9mm;
+    min-height: 9mm;
+    width: 100%;
+    box-sizing: border-box;
+    border-top: 0.25mm solid #283656;
+    padding: 1mm 1mm 0;
+    color: #283656;
+    font-size: 8pt;
+    font-weight: 500;
+    line-height: 1.05;
+    text-align: center;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .qr {
-    width: 20mm;
-    height: 20mm;
-    flex: 0 0 20mm;
+    width: 23mm;
+    height: 23mm;
+    flex: 0 0 23mm;
+    align-self: center;
     display: block;
     object-fit: contain;
     background: #fff;
@@ -1462,6 +1482,7 @@ footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
     .label {
         width: 8cm;
         height: 2.5cm;
+        box-sizing: border-box;
         border: 0.25mm solid #9da8b3;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
@@ -1591,16 +1612,19 @@ async function makeLabel(b){
  const card = document.createElement('div');
  card.className = 'label';
 
- // Logo oficial à esquerda
+ // Composição no padrão aprovado: logo + número na faixa superior,
+ // descrição centralizada abaixo e QR Code ocupando a lateral direita.
+ const left = document.createElement('div');
+ left.className = 'label-left';
+
+ const top = document.createElement('div');
+ top.className = 'label-top';
+
  const logo = document.createElement('img');
  logo.className = 'label-logo';
  logo.src = LOGO;
  logo.alt = 'CRCAL';
  logo.onerror = () => { logo.style.visibility = 'hidden'; };
-
- // Número patrimonial e descrição completa no centro
- const info = document.createElement('div');
- info.className = 'label-info';
 
  const num = document.createElement('div');
  num.className = 'label-num';
@@ -1610,19 +1634,20 @@ async function makeLabel(b){
  desc.className = 'label-desc';
  desc.textContent = clean(b.descricao);
 
- info.append(num, desc);
+ top.append(logo, num);
+ left.append(top, desc);
 
- // QR Code à direita: mantém o endereço antigo para não invalidar etiquetas já emitidas
+ // Mantém o endereço antigo para não invalidar QR Codes já emitidos.
  const canvas = document.createElement('canvas');
  canvas.className = 'qr';
  canvas.setAttribute('aria-label', 'QR Code do patrimônio ' + b.patrimonio);
 
- card.append(logo, info, canvas);
+ card.append(left, canvas);
 
  const url = BASE + '?id=' + encodeURIComponent(b.patrimonio);
  await QRCode.toCanvas(canvas, url, {
    width: 500,
-   margin: 2,
+   margin: 1,
    errorCorrectionLevel: 'H',
    color: { dark: '#000000', light: '#FFFFFF' }
  });
@@ -1631,10 +1656,10 @@ async function makeLabel(b){
 
 function ajustarDescricoesEtiquetas(){
  document.querySelectorAll('.label-desc').forEach(desc => {
-   let tamanho = 7;
+   let tamanho = 8;
    desc.style.fontSize = tamanho + 'pt';
    // Reduz gradualmente a fonte até que todo o texto caiba na área disponível.
-   while (tamanho > 4 && (desc.scrollHeight > desc.clientHeight + 1 || desc.scrollWidth > desc.clientWidth + 1)) {
+   while (tamanho > 5 && (desc.scrollHeight > desc.clientHeight + 1 || desc.scrollWidth > desc.clientWidth + 1)) {
      tamanho -= 0.25;
      desc.style.fontSize = tamanho + 'pt';
    }
