@@ -1409,6 +1409,35 @@ footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
     color: var(--azul);
 }
 
+/* ============================================================
+   ALINHAMENTO DOS BOTÕES EDITAR E EXCLUIR
+   ============================================================ */
+
+.table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.table-actions button {
+    margin: 0 !important;
+    min-width: 76px;
+    padding: 9px 12px;
+}
+
+th:last-child {
+    text-align: center;
+    min-width: 180px;
+}
+
+td.table-actions {
+    vertical-align: middle;
+}
+
 </style>
 </head>
 <body>
@@ -1498,17 +1527,107 @@ $('saveBtn').onclick=async()=>{
  resetForm();say('formMsg','Bem salvo com sucesso.');await loadBens();
 };
 function filteredBens(q){q=clean(q).toLocaleLowerCase('pt-BR');return bens.filter(b=>!q||[b.patrimonio,b.descricao,b.localizacao].some(v=>clean(v).toLocaleLowerCase('pt-BR').includes(q)))}
-function renderList(){
- const host=$('listHost'),arr=filteredBens($('searchBens').value),pages=Math.max(1,Math.ceil(arr.length/PAGE_SIZE));page=Math.min(page,pages);
- const slice=arr.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
- if(!slice.length){host.textContent='Nenhum bem encontrado.';$('pageInfo').textContent='0 registros';return}
- const table=document.createElement('table'),thead=document.createElement('thead'),trh=document.createElement('tr');
- ['Patrimônio','Descrição','Localização','Situação','Ações'].forEach(x=>{const th=document.createElement('th');th.textContent=x;trh.append(th)});thead.append(trh);table.append(thead);
- const tbody=document.createElement('tbody');
- slice.forEach(b=>{const tr=document.createElement('tr');[b.patrimonio,b.descricao,b.localizacao||'—',b.situacao||'—'].forEach(v=>{const td=document.createElement('td');td.textContent=v;tr.append(td)});
- const td=document.createElement('td'),edit=document.createElement('button');edit.textContent='Editar';edit.className='alt';edit.onclick=()=>beginEdit(b);
- const del=document.createElement('button');del.textContent='Excluir';del.className='danger';del.style.marginLeft='5px';del.onclick=async()=>{if(!confirm('Excluir o bem '+b.patrimonio+'? Esta ação não pode ser desfeita.'))return;const {error}=await db.from('bens_patrimoniais').delete().eq('id',b.id);if(error){alert('Erro ao excluir: '+error.message);return}selected.delete(b.id);await loadBens()};td.append(edit,del);tr.append(td);tbody.append(tr)});
- table.append(tbody);host.replaceChildren(table);$('pageInfo').textContent=`Página ${page} de ${pages} — ${arr.length} bem(ns)`;$('prev').disabled=page<=1;$('next').disabled=page>=pages;
+function renderList() {
+    const host = $('listHost');
+    const arr = filteredBens($('searchBens').value);
+    const pages = Math.max(1, Math.ceil(arr.length / PAGE_SIZE));
+
+    page = Math.min(page, pages);
+
+    const slice = arr.slice(
+        (page - 1) * PAGE_SIZE,
+        page * PAGE_SIZE
+    );
+
+    if (!slice.length) {
+        host.textContent = 'Nenhum bem encontrado.';
+        $('pageInfo').textContent = '0 registros';
+        return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    const trh = document.createElement('tr');
+
+    ['Patrimônio', 'Descrição', 'Localização', 'Situação', 'Ações']
+        .forEach(x => {
+            const th = document.createElement('th');
+            th.textContent = x;
+            trh.append(th);
+        });
+
+    thead.append(trh);
+    table.append(thead);
+
+    const tbody = document.createElement('tbody');
+
+    slice.forEach(b => {
+        const tr = document.createElement('tr');
+
+        [
+            b.patrimonio,
+            b.descricao,
+            b.localizacao || '—',
+            b.situacao || '—'
+        ].forEach(v => {
+            const td = document.createElement('td');
+            td.textContent = v;
+            tr.append(td);
+        });
+
+        // Coluna de ações
+        const td = document.createElement('td');
+        td.className = 'table-actions';
+
+        // Botão editar
+        const edit = document.createElement('button');
+        edit.textContent = 'Editar';
+        edit.className = 'alt';
+
+        edit.onclick = () => beginEdit(b);
+
+        // Botão excluir
+        const del = document.createElement('button');
+        del.textContent = 'Excluir';
+        del.className = 'danger';
+
+        del.onclick = async () => {
+            if (!confirm(
+                'Excluir o bem ' + b.patrimonio +
+                '? Esta ação não pode ser desfeita.'
+            )) {
+                return;
+            }
+
+            const { error } = await db
+                .from('bens_patrimoniais')
+                .delete()
+                .eq('id', b.id);
+
+            if (error) {
+                alert('Erro ao excluir: ' + error.message);
+                return;
+            }
+
+            selected.delete(b.id);
+
+            await loadBens();
+        };
+
+        td.append(edit, del);
+        tr.append(td);
+        tbody.append(tr);
+    });
+
+    table.append(tbody);
+
+    host.replaceChildren(table);
+
+    $('pageInfo').textContent =
+        `Página ${page} de ${pages} — ${arr.length} bem(ns)`;
+
+    $('prev').disabled = page <= 1;
+    $('next').disabled = page >= pages;
 }
 $('searchBens').oninput=()=>{page=1;renderList()};$('prev').onclick=()=>{page--;renderList()};$('next').onclick=()=>{page++;renderList()};$('refresh').onclick=loadBens;
 function renderChoices(){
