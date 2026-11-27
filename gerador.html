@@ -1409,10 +1409,38 @@ footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
     color: var(--azul);
 }
 
-/* ============================================================
-   ALINHAMENTO DOS BOTÕES EDITAR E EXCLUIR
-   ============================================================ */
 
+
+/* Ajuda sobre as situações patrimoniais */
+.status-help {
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: #f5f7fa;
+    border: 1px solid #dce3ea;
+    border-radius: 10px;
+}
+.status-help summary {
+    color: var(--azul);
+    font-weight: bold;
+    cursor: pointer;
+}
+.status-help-content {
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #dce3ea;
+}
+.status-help-content p {
+    margin: 9px 0;
+    line-height: 1.5;
+    font-size: 13px;
+}
+
+/* Filtros da listagem */
+.searchrow select {
+    max-width: 260px;
+}
+
+/* Alinhamento dos botões de ação */
 .table-actions {
     display: flex;
     align-items: center;
@@ -1422,18 +1450,15 @@ footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
     white-space: nowrap;
     vertical-align: middle;
 }
-
 .table-actions button {
     margin: 0 !important;
     min-width: 76px;
     padding: 9px 12px;
 }
-
 th:last-child {
     text-align: center;
     min-width: 180px;
 }
-
 td.table-actions {
     vertical-align: middle;
 }
@@ -1460,18 +1485,51 @@ td.table-actions {
 <h2 id="formTitle">Cadastrar novo bem</h2><p class="muted">Os dados são gravados diretamente na base patrimonial.</p>
 <div class="grid">
 <div><label for="pat">Número patrimonial *</label><input id="pat" placeholder="Ex.: 001258"></div>
-<div><label for="sit">Situação</label><select id="sit"><option>Em uso</option><option>Em estoque</option><option>Em manutenção</option><option>Baixado</option></select></div>
+<div>
+<label for="sit">Situação</label>
+<select id="sit">
+<option>EM USO</option>
+<option>EM ESTOQUE</option>
+<option>EM MANUTENÇÃO</option>
+<option>EMPRESTADO</option>
+<option>AGUARDANDO DESTINAÇÃO</option>
+<option>BAIXADO</option>
+</select>
+</div>
 <div class="wide"><label for="desc">Descrição *</label><input id="desc" placeholder="Ex.: Computador Dell OptiPlex"></div>
 <div><label for="loc">Localização</label><input id="loc" placeholder="Ex.: Departamento de Cobrança"></div>
 <div><label for="marca">Marca / modelo</label><input id="marca" placeholder="Ex.: Dell OptiPlex"></div>
 <div><label for="resp">Responsável / setor</label><input id="resp" placeholder="Ex.: DECOB"></div>
 <div><label for="obs">Observação</label><input id="obs" placeholder="Informação interna"></div>
 </div>
+<details class="status-help">
+    <summary>Entenda as situações patrimoniais</summary>
+    <div class="status-help-content">
+        <p><strong>EM USO:</strong> Bem em utilização normal pelo CRCAL.</p>
+        <p><strong>EM ESTOQUE:</strong> Bem disponível, mas ainda não destinado a um setor ou usuário.</p>
+        <p><strong>EM MANUTENÇÃO:</strong> Bem encaminhado para reparo ou manutenção.</p>
+        <p><strong>EMPRESTADO:</strong> Bem cedido temporariamente a alguém ou a outro setor/órgão.</p>
+        <p><strong>AGUARDANDO DESTINAÇÃO:</strong> Bem sem utilização, aguardando decisão sobre seu reaproveitamento, transferência ou baixa.</p>
+        <p><strong>BAIXADO:</strong> Bem cuja baixa patrimonial já foi formalizada.</p>
+    </div>
+</details>
 <div class="actions"><button id="saveBtn">Salvar bem</button><button id="cancelEdit" class="alt hidden">Cancelar edição</button></div><p id="formMsg" class="notice" aria-live="polite"></p>
 </section>
 <section id="tab-bens" class="panel hidden no-print">
 <h2>Bens cadastrados</h2><p class="muted">Pesquise pelo número patrimonial, descrição ou localização. Use Editar para alterar os dados.</p>
-<div class="searchrow"><input id="searchBens" placeholder="Pesquisar bens..."><button id="refresh" class="alt">Atualizar</button></div>
+<div class="searchrow">
+    <input id="searchBens" placeholder="Pesquisar bens...">
+    <select id="filterSituacao">
+        <option value="">Todas as situações</option>
+        <option value="EM USO">EM USO</option>
+        <option value="EM ESTOQUE">EM ESTOQUE</option>
+        <option value="EM MANUTENÇÃO">EM MANUTENÇÃO</option>
+        <option value="EMPRESTADO">EMPRESTADO</option>
+        <option value="AGUARDANDO DESTINAÇÃO">AGUARDANDO DESTINAÇÃO</option>
+        <option value="BAIXADO">BAIXADO</option>
+    </select>
+    <button id="refresh" class="alt">Atualizar</button>
+</div>
 <div id="listHost"></div><div class="pager"><button id="prev" class="alt">Anterior</button><span id="pageInfo"></span><button id="next" class="alt">Próxima</button></div>
 </section>
 <section id="tab-etiquetas" class="panel no-print hidden">
@@ -1506,12 +1564,12 @@ async function loadBens(){
  bens=data||[];renderList();renderChoices();say('formMsg','');
 }
 function resetForm(){
- editingId=null;['pat','desc','loc','marca','resp','obs'].forEach(id=>$(id).value='');$('sit').value='Em uso';
+ editingId=null;['pat','desc','loc','marca','resp','obs'].forEach(id=>$(id).value='');$('sit').value='EM USO';
  $('formTitle').textContent='Cadastrar novo bem';$('saveBtn').textContent='Salvar bem';$('cancelEdit').classList.add('hidden');
 }
 function beginEdit(b){
  editingId=b.id;$('pat').value=b.patrimonio||'';$('desc').value=b.descricao||'';$('loc').value=b.localizacao||'';
- $('marca').value=b.marca_modelo||'';$('resp').value=b.responsavel||'';$('obs').value=b.observacao||'';$('sit').value=b.situacao||'Em uso';
+ $('marca').value=b.marca_modelo||'';$('resp').value=b.responsavel||'';$('obs').value=b.observacao||'';$('sit').value=b.situacao||'EM USO';
  $('formTitle').textContent='Editar bem patrimonial';$('saveBtn').textContent='Salvar alterações';$('cancelEdit').classList.remove('hidden');
  showTab('cadastro');window.scrollTo({top:0,behavior:'smooth'});
 }
@@ -1526,10 +1584,29 @@ $('saveBtn').onclick=async()=>{
  if(result.error){say('formMsg','Não foi possível salvar: '+(result.error.code==='23505'?'Esse número patrimonial já está cadastrado.':result.error.message),true);return}
  resetForm();say('formMsg','Bem salvo com sucesso.');await loadBens();
 };
-function filteredBens(q){q=clean(q).toLocaleLowerCase('pt-BR');return bens.filter(b=>!q||[b.patrimonio,b.descricao,b.localizacao].some(v=>clean(v).toLocaleLowerCase('pt-BR').includes(q)))}
+function filteredBens(q, situacao = '') {
+    q = clean(q).toLocaleLowerCase('pt-BR');
+
+    return bens.filter(b => {
+        const correspondePesquisa = !q || [
+            b.patrimonio,
+            b.descricao,
+            b.localizacao
+        ].some(v => clean(v).toLocaleLowerCase('pt-BR').includes(q));
+
+        const correspondeSituacao = !situacao ||
+            clean(b.situacao).toLocaleUpperCase('pt-BR') === situacao;
+
+        return correspondePesquisa && correspondeSituacao;
+    });
+}
+
 function renderList() {
     const host = $('listHost');
-    const arr = filteredBens($('searchBens').value);
+    const arr = filteredBens(
+        $('searchBens').value,
+        $('filterSituacao').value
+    );
     const pages = Math.max(1, Math.ceil(arr.length / PAGE_SIZE));
 
     page = Math.min(page, pages);
@@ -1542,6 +1619,8 @@ function renderList() {
     if (!slice.length) {
         host.textContent = 'Nenhum bem encontrado.';
         $('pageInfo').textContent = '0 registros';
+        $('prev').disabled = true;
+        $('next').disabled = true;
         return;
     }
 
@@ -1550,9 +1629,9 @@ function renderList() {
     const trh = document.createElement('tr');
 
     ['Patrimônio', 'Descrição', 'Localização', 'Situação', 'Ações']
-        .forEach(x => {
+        .forEach(titulo => {
             const th = document.createElement('th');
-            th.textContent = x;
+            th.textContent = titulo;
             trh.append(th);
         });
 
@@ -1569,35 +1648,28 @@ function renderList() {
             b.descricao,
             b.localizacao || '—',
             b.situacao || '—'
-        ].forEach(v => {
+        ].forEach(valor => {
             const td = document.createElement('td');
-            td.textContent = v;
+            td.textContent = valor;
             tr.append(td);
         });
 
-        // Coluna de ações
         const td = document.createElement('td');
         td.className = 'table-actions';
 
-        // Botão editar
         const edit = document.createElement('button');
         edit.textContent = 'Editar';
         edit.className = 'alt';
-
         edit.onclick = () => beginEdit(b);
 
-        // Botão excluir
         const del = document.createElement('button');
         del.textContent = 'Excluir';
         del.className = 'danger';
-
         del.onclick = async () => {
             if (!confirm(
                 'Excluir o bem ' + b.patrimonio +
                 '? Esta ação não pode ser desfeita.'
-            )) {
-                return;
-            }
+            )) return;
 
             const { error } = await db
                 .from('bens_patrimoniais')
@@ -1610,7 +1682,6 @@ function renderList() {
             }
 
             selected.delete(b.id);
-
             await loadBens();
         };
 
@@ -1620,7 +1691,6 @@ function renderList() {
     });
 
     table.append(tbody);
-
     host.replaceChildren(table);
 
     $('pageInfo').textContent =
@@ -1629,7 +1699,29 @@ function renderList() {
     $('prev').disabled = page <= 1;
     $('next').disabled = page >= pages;
 }
-$('searchBens').oninput=()=>{page=1;renderList()};$('prev').onclick=()=>{page--;renderList()};$('next').onclick=()=>{page++;renderList()};$('refresh').onclick=loadBens;
+
+$('searchBens').oninput = () => {
+    page = 1;
+    renderList();
+};
+
+$('filterSituacao').onchange = () => {
+    page = 1;
+    renderList();
+};
+
+$('prev').onclick = () => {
+    page--;
+    renderList();
+};
+
+$('next').onclick = () => {
+    page++;
+    renderList();
+};
+
+$('refresh').onclick = loadBens;
+
 function renderChoices(){
  const host=$('labelChoices'),arr=filteredBens($('searchLabels').value);host.replaceChildren();
  if(!arr.length){host.textContent='Nenhum bem encontrado.';return}
