@@ -1324,6 +1324,91 @@ table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}td,th{t
 footer{text-align:center;color:#84909d;font-size:11px;padding:15px}
 @media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.head{align-items:flex-start;flex-direction:column}.searchrow{flex-direction:column;align-items:stretch}.label-grid{grid-template-columns:repeat(2,6cm)}table{display:block;overflow-x:auto}}
 @media print{@page{size:A4 portrait;margin:1cm}body{background:#fff}header,.no-print,footer{display:none!important}main{margin:0;padding:0;max-width:none}.panel{padding:0;margin:0;box-shadow:none}#labels{display:grid!important;grid-template-columns:repeat(3,6cm);gap:0}.label{border:1px solid #ddd}.qr{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+
+/* ETIQUETA — padrão visual original do gerador */
+.label {
+    width: 6cm;
+    height: 4cm;
+    padding: 2.5mm;
+    border: 1px dashed #b8c2cc;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
+}
+.label-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 8mm;
+    border-bottom: 1px solid var(--dourado);
+    padding-bottom: 1.5mm;
+}
+.label-logo {
+    width: 8mm;
+    height: 7mm;
+    object-fit: contain;
+}
+.label-brand {
+    display: flex;
+    align-items: center;
+    gap: 1.5mm;
+    color: var(--azul);
+    font-size: 8pt;
+    font-weight: bold;
+}
+.label-type {
+    color: var(--azul);
+    font-size: 7pt;
+    font-weight: bold;
+}
+.label-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2mm;
+    flex: 1;
+    min-height: 0;
+}
+.label-info {
+    flex: 1;
+    min-width: 0;
+}
+.label-num {
+    font-size: 19pt;
+    font-weight: 800;
+    color: var(--azul);
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+}
+.label-desc {
+    font-size: 7.5pt;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-top: 1.5mm;
+    max-height: 10mm;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.qr {
+    width: 20mm;
+    height: 20mm;
+    flex: 0 0 20mm;
+    display: block;
+    object-fit: contain;
+    background: white;
+}
+.label-foot {
+    text-align: center;
+    font-size: 6.5pt;
+    border-top: 1px solid #dce3ea;
+    padding-top: 1mm;
+    color: var(--azul);
+}
+
 </style>
 </head>
 <body>
